@@ -7,6 +7,10 @@ builddir:
 run: build
 	./builddir/arcade
 
+fmt:
+	meson format -ir
+	find src -iname '*.h' -o -iname '*.c' | xargs clang-format -i
+
 clean:
 	rm -rf builddir
 
