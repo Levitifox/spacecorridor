@@ -200,7 +200,10 @@ void init(SDL_Window **window, SDL_Renderer **renderer, textures_t *textures, wo
 /**
  *  \brief programme principal qui implémente la boucle du jeu
  */
-int main(int argc, char *args[]) {
+int main(int argc, char **argv) {
+    (void) argc;
+    (void) argv;
+
     SDL_Event event;
     world_t world;
     textures_t textures;
