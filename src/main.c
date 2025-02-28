@@ -137,7 +137,7 @@ void clean_textures(textures_t *textures) {
  * \param textures les textures du jeu
  */
 void init_textures(SDL_Renderer *renderer, textures_t *textures) {
-    textures->background = load_image("ressources/background.bmp", renderer);
+    textures->background = load_image("resources/background.png", renderer);
 
     /* A COMPLETER */
 }

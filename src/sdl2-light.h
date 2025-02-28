@@ -2,6 +2,7 @@
 #define __SDL2_LIGHT__H__
 
 #include <SDL.h>
+#include <SDL_image.h>
 
 /**
  * \brief La fonction nettoie le renderer et la fenêtre du jeu en mémoire
