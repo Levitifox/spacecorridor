@@ -4,17 +4,17 @@
 
 int init_sdl(SDL_Window **window, SDL_Renderer **renderer, int width, int height) {
     if (0 != SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO)) {
-        fprintf(stderr, "Erreur initialisation de la SDL : %s", SDL_GetError());
+        fprintf(stderr, "Erreur initialisation de la SDL : %s\n", SDL_GetError());
         return -1;
     }
     SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
     int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
     if (!(IMG_Init(img_flags) & img_flags)) {
-        fprintf(stderr, "Erreur initialisation de la IMG : %s", IMG_GetError());
+        fprintf(stderr, "Erreur initialisation de la IMG : %s\n", IMG_GetError());
         return -1;
     }
     if (0 != SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_SHOWN, window, renderer)) {
-        fprintf(stderr, "Erreur lors de la creation de l'image et du renderer : %s", SDL_GetError());
+        fprintf(stderr, "Erreur lors de la creation de l'image et du renderer : %s\n", SDL_GetError());
         return -1;
     }
     return 0;
@@ -23,7 +23,7 @@ int init_sdl(SDL_Window **window, SDL_Renderer **renderer, int width, int height
 SDL_Texture *load_image(const char path[], SDL_Renderer *renderer) {
     SDL_Surface *image_surface = IMG_Load(path);
     if (NULL == image_surface) {
-        fprintf(stderr, "Erreur pendant chargement image: %s", IMG_GetError());
+        fprintf(stderr, "Erreur pendant chargement image : %s\n", IMG_GetError());
         return NULL;
     }
     SDL_Surface *window_surface = SDL_GetWindowSurface(SDL_RenderGetWindow(renderer));
@@ -34,14 +34,14 @@ SDL_Texture *load_image(const char path[], SDL_Renderer *renderer) {
     SDL_Surface *converted_image_surface = SDL_ConvertSurface(image_surface, window_surface->format, 0);
     SDL_FreeSurface(image_surface);
     if (converted_image_surface == NULL) {
-        printf("Impossible d'optimiser l'image! Erreur SDL: %s", SDL_GetError());
+        printf("Impossible d'optimiser l'image! Erreur SDL : %s\n", SDL_GetError());
         return NULL;
     }
     SDL_SetColorKey(converted_image_surface, SDL_TRUE, SDL_MapRGB(converted_image_surface->format, 255, 0, 255));
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, converted_image_surface);
     SDL_FreeSurface(converted_image_surface);
     if (NULL == texture) {
-        fprintf(stderr, "Erreur pendant creation de la texture liee a l'image chargee: %s", SDL_GetError());
+        fprintf(stderr, "Erreur pendant creation de la texture liee a l'image chargee : %s\n", SDL_GetError());
         return NULL;
     }
     return texture;
