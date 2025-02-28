@@ -201,10 +201,8 @@ void init(SDL_Window **window, SDL_Renderer **renderer, textures_t *textures, wo
  *  \brief programme principal qui implémente la boucle du jeu
  */
 int main(int argc, char **argv) {
-    (void) argc;
-    (void) argv;
-
-    SDL_Event event;
+    (void)argc;
+    (void)argv;
     world_t world;
     textures_t textures;
     SDL_Renderer *renderer;
@@ -214,6 +212,7 @@ int main(int argc, char **argv) {
     init(&window, &renderer, &textures, &world);
 
     while (!is_game_over(&world)) { // tant que le jeu n'est pas fini
+        SDL_Event event;
 
         // gestion des évènements
         handle_events(&event, &world);
