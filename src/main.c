@@ -35,13 +35,30 @@
  */
 #define INITIAL_SPEED 2
 
+struct sprite_s {
+    int x;
+    int y;
+    int h;
+    int w;
+};
+typedef struct sprite_s sprite_t;
+
 /**
  * \brief Représentation pour stocker les textures nécessaires à l'affichage graphique
  */
+
 struct textures_s {
     SDL_Texture *background; /*!< Texture liée à l'image du fond de l'écran. */
-    /* A COMPLETER */
+    SDL_Texture *spaceship;
+    SDL_Texture *ligne;
 };
+
+void init_sprite(sprite_t *sprite, int x, int y, int w, int h) {
+    sprite->x = x;
+    sprite->y = y;
+    sprite->w = w;
+    sprite->h = h;
+}
 
 /**
  * \brief Type qui correspond aux textures du jeu
@@ -55,8 +72,10 @@ struct world_s {
     /*
       A COMPLETER
      */
-
+    sprite_t spaceship;
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
+    sprite_t ligne;
+    // c'est la ligne d'arrivée
 };
 
 /**
@@ -68,9 +87,24 @@ typedef struct world_s world_t;
  * \brief La fonction initialise les données du monde du jeu
  * \param world les données du monde
  */
+
+void print_sprite(sprite_t *sprite) {
+    printf("ses coordonnées : %d, %d sa hauteur %d sa largeur %d", sprite->x, sprite->y, sprite->h, sprite->w);
+}
+
 void init_data(world_t *world) {
+
     // on n'est pas à la fin du jeu
     world->gameover = 0;
+
+    int ship_x = SCREEN_WIDTH / 2;
+    int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
+
+    init_sprite(&world->spaceship, ship_x, ship_y, SHIP_SIZE, SHIP_SIZE);
+    print_sprite(&world->spaceship);
+
+    init_sprite(&world->ligne, ship_x, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+    print_sprite(&world->ligne);
 }
 
 /**
@@ -94,7 +128,12 @@ int is_game_over(world_t *world) {
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param les données du monde
  */
+
 void update_data(world_t *world) {
+    if (world->ligne.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
+        world->ligne.y = world->ligne.y + INITIAL_SPEED;
+    }
+
     /* A COMPLETER */
 }
 
@@ -103,7 +142,8 @@ void update_data(world_t *world) {
  * \param event paramètre qui contient les événements
  * \param world les données du monde
  */
-void handle_events(SDL_Event *event, world_t *world) {
+
+/*void handle_events(SDL_Event *event,world_t *world){
     Uint8 *keystates;
     while (SDL_PollEvent(event)) {
         // Si l'utilisateur a cliqué sur le X de la fenêtre
@@ -121,6 +161,41 @@ void handle_events(SDL_Event *event, world_t *world) {
         }
     }
 }
+    */
+void handle_events(SDL_Event *event, world_t *world) {
+    Uint8 *keystates;
+    while (SDL_PollEvent(event)) {
+
+        // Si l'utilisateur a cliqué sur le X de la fenêtre
+        if (event->type == SDL_QUIT) {
+            // On indique la fin du jeu
+            world->gameover = 1;
+        }
+
+        // si une touche est appuyée
+        if (event->type == SDL_KEYDOWN) {
+            // si la touche appuyée est 'D'
+            if (event->key.keysym.sym == SDLK_d) {
+                printf("La touche D est appuyée\n");
+            }
+            if (event->key.keysym.sym == SDLK_q) {
+                world->spaceship.x = world->spaceship.x - MOVING_STEP;
+            }
+            if (event->key.keysym.sym == SDLK_d) {
+                world->spaceship.x = world->spaceship.x + MOVING_STEP;
+            }
+            if (event->key.keysym.sym == SDLK_s) {
+                world->spaceship.y = world->spaceship.y + MOVING_STEP;
+            }
+            if (event->key.keysym.sym == SDLK_z) {
+                world->spaceship.y = world->spaceship.y - MOVING_STEP;
+            }
+            if (event->key.keysym.sym == SDLK_ESCAPE) {
+                world->gameover = 1;
+            }
+        }
+    }
+}
 
 /**
  * \brief La fonction nettoie les textures
@@ -128,6 +203,8 @@ void handle_events(SDL_Event *event, world_t *world) {
  */
 void clean_textures(textures_t *textures) {
     clean_texture(textures->background);
+    clean_texture(textures->spaceship);
+    clean_texture(textures->ligne);
     /* A COMPLETER */
 }
 
@@ -137,9 +214,15 @@ void clean_textures(textures_t *textures) {
  * \param textures les textures du jeu
  */
 void init_textures(SDL_Renderer *renderer, textures_t *textures) {
-    textures->background = load_image("resources/background.png", renderer);
-
+    textures->background = load_image("resources/space-background.png", renderer);
+    textures->spaceship = load_image("resources/spaceship.png", renderer);
+    textures->ligne = load_image("resources/finish_line.png", renderer);
     /* A COMPLETER */
+}
+
+void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {
+    SDL_Rect rect = {sprite->x - sprite->w / 2, sprite->y - sprite->h / 2, sprite->w, sprite->h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
 }
 
 /**
@@ -166,6 +249,10 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, textures_t *textur
     // application des textures dans le renderer
     apply_background(renderer, textures->background);
     /* A COMPLETER */
+    // apply_texture(renderer, textures->background, 0, 0);
+    apply_texture(textures->background, renderer, 0, 0);
+    apply_sprite(renderer, textures->spaceship, &world->spaceship);
+    apply_sprite(renderer, textures->ligne, &world->ligne);
 
     // on met à jour l'écran
     update_screen(renderer);
