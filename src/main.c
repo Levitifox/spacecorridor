@@ -51,6 +51,7 @@ struct textures_s {
     SDL_Texture *background; /*!< Texture liée à l'image du fond de l'écran. */
     SDL_Texture *spaceship;
     SDL_Texture *ligne;
+    SDL_Texture *meteorite;
 };
 
 void init_sprite(sprite_t *sprite, int x, int y, int w, int h) {
@@ -75,6 +76,10 @@ struct world_s {
     sprite_t spaceship;
     int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_t ligne;
+    sprite_t mur;
+    int speed;
+    int down; // la ligne est en bas
+
     // c'est la ligne d'arrivée
 };
 
@@ -91,11 +96,24 @@ typedef struct world_s world_t;
 void print_sprite(sprite_t *sprite) {
     printf("ses coordonnées : %d, %d sa hauteur %d sa largeur %d", sprite->x, sprite->y, sprite->h, sprite->w);
 }
-
+// les  21 meteos
+void apply_wall(int h, int w, SDL_Renderer *renderer, SDL_Texture *texture, world_t *world) {
+    int px = world->mur.x;
+    int py = world->mur.y;
+    int meteo = 192;
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            apply_texture(texture, renderer, px - (w * METEORITE_SIZE) / 2 + j * METEORITE_SIZE, py - (h * METEORITE_SIZE) / 2 + i * METEORITE_SIZE + meteo);
+        }
+    }
+}
+// afficher
 void init_data(world_t *world) {
 
     // on n'est pas à la fin du jeu
     world->gameover = 0;
+    world->speed = INITIAL_SPEED;
+    world->down = 1;
 
     int ship_x = SCREEN_WIDTH / 2;
     int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
@@ -105,6 +123,9 @@ void init_data(world_t *world) {
 
     init_sprite(&world->ligne, ship_x, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
     print_sprite(&world->ligne);
+
+    init_sprite(&world->mur, ship_x, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+    print_sprite(&world->mur);
 }
 
 /**
@@ -128,13 +149,32 @@ int is_game_over(world_t *world) {
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param les données du monde
  */
-
+// ex 4.6
 void update_data(world_t *world) {
-    if (world->ligne.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
-        world->ligne.y = world->ligne.y + INITIAL_SPEED;
-    }
+    if (world->down == 1) { // la ligne va vers la vers bas
 
-    /* A COMPLETER */
+        if (world->ligne.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
+            world->ligne.y = world->ligne.y + world->speed;
+        } else {
+            world->down = 0;
+        }
+        if (world->mur.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
+            world->mur.y = world->mur.y + world->speed;
+        }
+
+    } else {
+        // la ligne va vers la vers haut
+        if (world->ligne.y > 0) {
+            world->ligne.y = world->ligne.y - world->speed;
+        }
+
+        else {
+            world->down = 1;
+        }
+        if (world->mur.y > 0) {
+            world->mur.y = world->mur.y - world->speed;
+        }
+    }
 }
 
 /**
@@ -193,6 +233,17 @@ void handle_events(SDL_Event *event, world_t *world) {
             if (event->key.keysym.sym == SDLK_ESCAPE) {
                 world->gameover = 1;
             }
+            if (event->key.keysym.sym == SDLK_DOWN) {
+                if (world->speed > 1) {
+                    world->speed -= 1;
+                }
+            }
+
+            if (event->key.keysym.sym == SDLK_UP) {
+                if (world->speed < 8) {
+                    world->speed += 1;
+                }
+            }
         }
     }
 }
@@ -205,6 +256,8 @@ void clean_textures(textures_t *textures) {
     clean_texture(textures->background);
     clean_texture(textures->spaceship);
     clean_texture(textures->ligne);
+    clean_texture(textures->meteorite);
+
     /* A COMPLETER */
 }
 
@@ -217,6 +270,7 @@ void init_textures(SDL_Renderer *renderer, textures_t *textures) {
     textures->background = load_image("resources/space-background.png", renderer);
     textures->spaceship = load_image("resources/spaceship.png", renderer);
     textures->ligne = load_image("resources/finish_line.png", renderer);
+    textures->meteorite = load_image("resources/meteorite.png", renderer);
     /* A COMPLETER */
 }
 
@@ -253,7 +307,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, textures_t *textur
     apply_texture(textures->background, renderer, 0, 0);
     apply_sprite(renderer, textures->spaceship, &world->spaceship);
     apply_sprite(renderer, textures->ligne, &world->ligne);
-
+    apply_wall(7, 3, renderer, textures->meteorite, world);
     // on met à jour l'écran
     update_screen(renderer);
 }
