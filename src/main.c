@@ -70,7 +70,7 @@ typedef struct textures_s textures_t;
  */
 struct world_s {
     sprite_t spaceship;
-    int gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
+    int gameover;   /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_t ligne; /*!< La ligne d'arrivée */
     sprite_t mur;
     int speed;
@@ -117,7 +117,8 @@ void init_data(world_t *world) {
     init_sprite(&world->ligne, ship_x, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
     print_sprite("ligne", &world->ligne);
 
-    init_sprite(&world->mur, ship_x, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+    /* Mur de météorites centré, 3 × 7 */
+    init_sprite(&world->mur, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3 * METEORITE_SIZE, 7 * METEORITE_SIZE);
     print_sprite("mur", &world->mur);
 }
 
@@ -143,7 +144,7 @@ int is_game_over(world_t *world) {
  * \param les données du monde
  */
 void update_data(world_t *world) {
-    if (world->down == 1) { 
+    if (world->down == 1) {
         // la ligne va vers la vers bas
         if (world->ligne.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
             world->ligne.y = world->ligne.y + world->speed;
@@ -173,7 +174,6 @@ void update_data(world_t *world) {
  * \param world les données du monde
  */
 void handle_events(SDL_Event *event, world_t *world) {
-    Uint8 *keystates;
     while (SDL_PollEvent(event)) {
         // Si l'utilisateur a cliqué sur le X de la fenêtre
         if (event->type == SDL_QUIT) {
@@ -184,33 +184,27 @@ void handle_events(SDL_Event *event, world_t *world) {
         // si une touche est appuyée
         if (event->type == SDL_KEYDOWN) {
             // si la touche appuyée est 'D'
-            if (event->key.keysym.sym == SDLK_d) {
-                printf("La touche D est appuyée\n");
-            }
-            if (event->key.keysym.sym == SDLK_q) {
+            // if (event->key.keysym.sym == SDLK_d) {
+            //     printf("La touche D est appuyée\n");
+            // }
+
+            // Gestion des mouvements
+            if (event->key.keysym.sym == SDLK_q || event->key.keysym.sym == SDLK_a || event->key.keysym.sym == SDLK_LEFT) {
                 world->spaceship.x = world->spaceship.x - MOVING_STEP;
             }
-            if (event->key.keysym.sym == SDLK_d) {
+            if (event->key.keysym.sym == SDLK_d || event->key.keysym.sym == SDLK_RIGHT) {
                 world->spaceship.x = world->spaceship.x + MOVING_STEP;
             }
-            if (event->key.keysym.sym == SDLK_s) {
+            if (event->key.keysym.sym == SDLK_s || event->key.keysym.sym == SDLK_DOWN) {
                 world->spaceship.y = world->spaceship.y + MOVING_STEP;
             }
-            if (event->key.keysym.sym == SDLK_z) {
+            if (event->key.keysym.sym == SDLK_z || event->key.keysym.sym == SDLK_w || event->key.keysym.sym == SDLK_UP) {
                 world->spaceship.y = world->spaceship.y - MOVING_STEP;
             }
+
+            // Quitter (Echap)
             if (event->key.keysym.sym == SDLK_ESCAPE) {
                 world->gameover = 1;
-            }
-            if (event->key.keysym.sym == SDLK_DOWN) {
-                if (world->speed > 1) {
-                    world->speed -= 1;
-                }
-            }
-            if (event->key.keysym.sym == SDLK_UP) {
-                if (world->speed < 8) {
-                    world->speed += 1;
-                }
             }
         }
     }
@@ -238,7 +232,7 @@ void init_textures(SDL_Renderer *renderer, textures_t *textures) {
     textures->ligne = load_image("resources/finish_line.png", renderer);
     textures->meteorite = load_image("resources/meteorite.png", renderer);
 }
-`
+
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {
     SDL_Rect rect = {sprite->x - sprite->w / 2, sprite->y - sprite->h / 2, sprite->w, sprite->h};
     SDL_RenderCopy(renderer, texture, NULL, &rect);
