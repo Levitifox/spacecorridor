@@ -35,8 +35,10 @@ void init_textures(SDL_Renderer *renderer, textures_t *textures) {
 }
 
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {
-    SDL_Rect rect = {sprite->x - sprite->w / 2, sprite->y - sprite->h / 2, sprite->w, sprite->h};
-    SDL_RenderCopy(renderer, texture, NULL, &rect);
+    if (sprite->is_visible) {
+        SDL_Rect rect = {sprite->x - sprite->w / 2, sprite->y - sprite->h / 2, sprite->w, sprite->h};
+        SDL_RenderCopy(renderer, texture, NULL, &rect);
+    }
 }
 
 /**

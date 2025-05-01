@@ -17,6 +17,7 @@ struct sprite_s {
     int y;
     int h;
     int w;
+    int is_visible;
 };
 typedef struct sprite_s sprite_t;
 
@@ -50,5 +51,13 @@ int is_game_over(world_t *world);
 void update_data(world_t *world);
 
 void handle_events(SDL_Event *event, world_t *world);
+
+void check_left_boundary(sprite_t *spaceship);
+
+void check_right_boundary(sprite_t *spaceship);
+
+int sprites_collide(sprite_t *sp1, sprite_t *sp2);
+
+void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, int make_disappear);
 
 #endif
