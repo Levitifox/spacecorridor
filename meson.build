@@ -5,7 +5,7 @@ sdl2_image = dependency('sdl2_image', required: true)
 
 executable(
     'arcade',
-    ['src/sdl2-light.c', 'src/main.c'],
+    ['src/sdl2-light.c', 'src/main.c', 'src/game.c', 'src/graphics.c'],
     dependencies: [sdl2, sdl2_image],
     install: true,
 )
