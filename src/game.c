@@ -115,11 +115,6 @@ void handle_events(SDL_Event *event, world_t *world) {
 
         // si une touche est appuyée
         if (event->type == SDL_KEYDOWN) {
-            // si la touche appuyée est 'D'
-            // if (event->key.keysym.sym == SDLK_d) {
-            //     printf("La touche D est appuyée\n");
-            // }
-
             // Gestion des mouvements
             if (event->key.keysym.sym == SDLK_q || event->key.keysym.sym == SDLK_a || event->key.keysym.sym == SDLK_LEFT) {
                 world->spaceship.x = world->spaceship.x - MOVING_STEP;
