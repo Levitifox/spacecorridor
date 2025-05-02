@@ -9,6 +9,9 @@
 #ifndef __CONSTANTS_H__
 #define __CONSTANTS_H__
 
+#define MAX(a, b) ((a) >= (b) ? (a) : (b))
+#define MIN(a, b) ((a) <= (b) ? (a) : (b))
+
 /**
  * \brief Largeur de l'écran de jeu
  */

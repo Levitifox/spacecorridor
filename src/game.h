@@ -27,11 +27,14 @@ typedef struct sprite_s sprite_t;
  */
 struct world_s {
     sprite_t spaceship;
-    bool gameover;  /*!< Champ indiquant si l'on est à la fin du jeu */
-    sprite_t ligne; /*!< La ligne d'arrivée */
-    sprite_t mur;
+    bool gameover;     /*!< Champ indiquant si l'on est à la fin du jeu */
+    sprite_t ligne;    /*!< La ligne d'arrivée */
+    sprite_t murs[10]; /*!< Tableau de murs de météorites */
     int speed;
-    bool down; /*!< La ligne est en bas */
+    bool down;                    /*!< La ligne est en bas */
+    Uint64 start_time;            /*!< Temps de début du jeu */
+    Uint64 time_since_game_start; /*!< Le temps écoulé */
+    bool has_won;
 };
 
 /**
@@ -60,5 +63,9 @@ void check_right_boundary(sprite_t *spaceship);
 bool sprites_collide(sprite_t *sp1, sprite_t *sp2);
 
 void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, bool make_disappear);
+
+void init_walls(world_t *world);
+
+void update_walls(world_t *world);
 
 #endif

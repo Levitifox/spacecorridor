@@ -31,6 +31,8 @@ void init_data(world_t *world) {
     world->gameover = false;
     world->speed = INITIAL_SPEED;
     world->down = true;
+    world->start_time = SDL_GetTicks64();
+    world->has_won = false;
 
     int ship_x = SCREEN_WIDTH / 2;
     int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
@@ -38,12 +40,35 @@ void init_data(world_t *world) {
     init_sprite(&world->spaceship, ship_x, ship_y, SHIP_SIZE, SHIP_SIZE);
     print_sprite("spaceship", &world->spaceship);
 
-    init_sprite(&world->ligne, ship_x, FINISH_LINE_HEIGHT, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
+    init_sprite(&world->ligne, SCREEN_WIDTH / 2, -960, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
     print_sprite("ligne", &world->ligne);
 
-    /* Mur de météorites centré, 3 × 7 */
-    init_sprite(&world->mur, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 3 * METEORITE_SIZE, 7 * METEORITE_SIZE);
-    print_sprite("mur", &world->mur);
+    // Initialisation des murs de météorites pour former des couloirs
+    init_walls(world);
+}
+
+/**
+ * \brief Initialise les positions des murs de météorites pour former des couloirs
+ * \param world Les données du monde
+ */
+void init_walls(world_t *world) {
+    // Caractéristiques des murs
+    // clang-format off
+    int wall_positions[6][4] = {
+        {48, 0, 96, 192}, // x, y, largeur, hauteur pour le mur
+        {252, 0, 96, 192},
+        {16, -352, 32, 160},
+        {188, -352, 224, 160},
+        {48, -672, 96, 192},
+        {252, -672, 96, 192}
+    };
+    // clang-format on
+
+    // Initialisation des murs
+    for (int i = 0; i < 6; i++) {
+        init_sprite(&world->murs[i], wall_positions[i][0], wall_positions[i][1], wall_positions[i][2], wall_positions[i][3]);
+        print_sprite("mur", &world->murs[i]);
+    }
 }
 
 /**
@@ -57,7 +82,7 @@ void clean_data(world_t *world) {
 /**
  * \brief La fonction indique si le jeu est fini en fonction des données du monde
  * \param world les données du monde
- * \return 1 si le jeu est fini, 0 sinon
+ * \return true si le jeu est fini, false sinon
  */
 bool is_game_over(world_t *world) {
     return world->gameover;
@@ -65,9 +90,24 @@ bool is_game_over(world_t *world) {
 
 /**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
- * \param les données du monde
+ * \param world les données du monde
  */
 void update_data(world_t *world) {
+    world->time_since_game_start = SDL_GetTicks64() - world->start_time;
+
+    if (world->gameover) {
+        return;
+    }
+
+    // Collision avec la ligne d'arrivée
+    if (sprites_collide(&world->spaceship, &world->ligne)) {
+        world->gameover = true;
+        world->has_won = true;
+        printf("You finished in %.2f s!\n", world->time_since_game_start / 1000.0);
+        return;
+    }
+
+    // Mise à jour de la position de la ligne d'arrivée
     if (world->down) {
         // la ligne va vers la vers bas
         if (world->ligne.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
@@ -75,10 +115,6 @@ void update_data(world_t *world) {
         } else {
             world->down = false;
         }
-        if (world->mur.y < SCREEN_HEIGHT - world->mur.h / 2) {
-            world->mur.y = world->mur.y + world->speed;
-        }
-
     } else {
         // la ligne va vers la vers haut
         if (world->ligne.y > FINISH_LINE_HEIGHT / 2) {
@@ -86,18 +122,34 @@ void update_data(world_t *world) {
         } else {
             world->down = true;
         }
-        if (world->mur.y > world->mur.h / 2) {
-            world->mur.y = world->mur.y - world->speed;
-        }
     }
 
-    // Vérifications des limites du vaisseau
+    // Mise à jour des murs et vérifications des limites du vaisseau
+    update_walls(world);
     check_left_boundary(&world->spaceship);
     check_right_boundary(&world->spaceship);
+
     // Collision entre le vaisseau et le mur de météorites
-    handle_sprites_collision(&world->spaceship, &world->mur, world, true);
-    // Collision entre le vaisseau et la ligne d'arrivée
-    handle_sprites_collision(&world->spaceship, &world->ligne, world, false);
+    for (int i = 0; i < 6; i++) {
+        if (sprites_collide(&world->spaceship, &world->murs[i])) {
+            world->gameover = true;
+            printf("You lost!\n");
+            return;
+        }
+    }
+}
+
+/**
+ * \brief Met à jour la position des murs de météorites
+ * \param world Les données du monde
+ */
+void update_walls(world_t *world) {
+    for (int i = 0; i < 6; i++) {
+        // Mettre à jour uniquement si le mur est visible
+        if (world->murs[i].is_visible) {
+            world->murs[i].y += world->speed;
+        }
+    }
 }
 
 /**
@@ -166,8 +218,8 @@ void check_right_boundary(sprite_t *spaceship) {
  * \return true s'il y a collision, false sinon
  */
 bool sprites_collide(sprite_t *sp1, sprite_t *sp2) {
-    // Utilisation de la formule du document : |x1 - x2| <= (w1 + w2) / 2 ET |y1 - y2| <= (h1 + h2) / 2
-    return (sp1->x - sp2->x) < (sp1->w + sp2->w) / 2 && abs(sp1->y - sp2->y) < (sp1->h + sp2->h) / 2;
+    return MAX(sp1->x - sp1->w / 2, sp2->x - sp2->w / 2) <= MIN(sp1->x + sp1->w / 2, sp2->x + sp2->w / 2) &&
+           MAX(sp1->y - sp1->h / 2, sp2->y - sp2->h / 2) <= MIN(sp1->y + sp1->h / 2, sp2->y + sp2->h / 2);
 }
 
 /**

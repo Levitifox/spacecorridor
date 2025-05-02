@@ -59,12 +59,38 @@ void apply_background(SDL_Renderer *renderer, SDL_Texture *texture) {
  * \param texture la texture liée au fond
  */
 void apply_wall(int h, int w, SDL_Renderer *renderer, SDL_Texture *texture, world_t *world) {
-    int px = world->mur.x;
-    int py = world->mur.y;
+    int px = world->murs->x;
+    int py = world->murs->y;
     int meteo = 192;
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
             apply_texture(texture, renderer, px - (w * METEORITE_SIZE) / 2 + j * METEORITE_SIZE, py - (h * METEORITE_SIZE) / 2 + i * METEORITE_SIZE + meteo);
+        }
+    }
+}
+
+/**
+ * \brief Applique les murs de météorites sur le renderer
+ * \param renderer Le renderer
+ * \param world Les données du monde
+ * \param texture La texture des murs
+ */
+void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
+    for (int i = 0; i < 6; i++) {
+        // calculer le nombre de météorites à dessiner horizontalement et verticalement
+        int num_meteos_x = world->murs[i].w / METEORITE_SIZE;
+        int num_meteos_y = world->murs[i].h / METEORITE_SIZE;
+
+        // calculer les positions x et y de départ des météorites
+        int start_x = world->murs[i].x - world->murs[i].w / 2;
+        int start_y = world->murs[i].y - world->murs[i].h / 2;
+
+        // dessine les météorites
+        for (int j = 0; j < num_meteos_y; j++) {
+            for (int k = 0; k < num_meteos_x; k++) {
+                SDL_Rect rect = {start_x + k * METEORITE_SIZE, start_y + j * METEORITE_SIZE, METEORITE_SIZE, METEORITE_SIZE};
+                SDL_RenderCopy(renderer, texture, NULL, &rect);
+            }
         }
     }
 }
@@ -83,7 +109,13 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, textures_t *textur
     apply_texture(textures->background, renderer, 0, 0);
     apply_sprite(renderer, textures->spaceship, &world->spaceship);
     apply_sprite(renderer, textures->ligne, &world->ligne);
-    apply_wall(7, 3, renderer, textures->meteorite, world);
-    // on met à jour l'écran
+
+    // afficher les murs uniquement si le jeu n'est pas terminé
+    if (!world->gameover) {
+        apply_walls(renderer, world, textures->meteorite);
+    }
+
+    // Met à jour l'affichage
     update_screen(renderer);
 }
+`
