@@ -52,7 +52,12 @@ void apply_background(SDL_Renderer *renderer, SDL_Texture *texture) {
     }
 }
 
-// les 21 meteos
+/**
+ * \brief Dessiner les meteos
+ * \param renderer le renderer
+ * \param world les données du monde
+ * \param texture la texture liée au fond
+ */
 void apply_wall(int h, int w, SDL_Renderer *renderer, SDL_Texture *texture, world_t *world) {
     int px = world->mur.x;
     int py = world->mur.y;

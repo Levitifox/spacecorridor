@@ -51,7 +51,7 @@ void init_data(world_t *world) {
  * \param world les données du monde
  */
 void clean_data(world_t *world) {
-    /* utile uniquement si vous avez fait de l'allocation dynamique (malloc); la fonction ici doit permettre de libérer la mémoire (free) */
+    (void)world;
 }
 
 /**

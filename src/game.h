@@ -15,8 +15,8 @@
 struct sprite_s {
     int x;
     int y;
-    int h;
     int w;
+    int h;
     int is_visible;
 };
 typedef struct sprite_s sprite_t;
