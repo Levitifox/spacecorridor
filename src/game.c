@@ -15,7 +15,7 @@ void init_sprite(sprite_t *sprite, int x, int y, int w, int h) {
     sprite->y = y;
     sprite->w = w;
     sprite->h = h;
-    sprite->is_visible = 1;
+    sprite->is_visible = true;
 }
 
 void print_sprite(char *name, sprite_t *sprite) {
@@ -28,9 +28,9 @@ void print_sprite(char *name, sprite_t *sprite) {
  */
 void init_data(world_t *world) {
     // on n'est pas à la fin du jeu
-    world->gameover = 0;
+    world->gameover = false;
     world->speed = INITIAL_SPEED;
-    world->down = 1;
+    world->down = true;
 
     int ship_x = SCREEN_WIDTH / 2;
     int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
@@ -59,7 +59,7 @@ void clean_data(world_t *world) {
  * \param world les données du monde
  * \return 1 si le jeu est fini, 0 sinon
  */
-int is_game_over(world_t *world) {
+bool is_game_over(world_t *world) {
     return world->gameover;
 }
 
@@ -68,12 +68,12 @@ int is_game_over(world_t *world) {
  * \param les données du monde
  */
 void update_data(world_t *world) {
-    if (world->down == 1) {
+    if (world->down) {
         // la ligne va vers la vers bas
         if (world->ligne.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
             world->ligne.y = world->ligne.y + world->speed;
         } else {
-            world->down = 0;
+            world->down = false;
         }
         if (world->mur.y < SCREEN_HEIGHT - world->mur.h / 2) {
             world->mur.y = world->mur.y + world->speed;
@@ -84,7 +84,7 @@ void update_data(world_t *world) {
         if (world->ligne.y > FINISH_LINE_HEIGHT / 2) {
             world->ligne.y = world->ligne.y - world->speed;
         } else {
-            world->down = 1;
+            world->down = true;
         }
         if (world->mur.y > world->mur.h / 2) {
             world->mur.y = world->mur.y - world->speed;
@@ -95,9 +95,9 @@ void update_data(world_t *world) {
     check_left_boundary(&world->spaceship);
     check_right_boundary(&world->spaceship);
     // Collision entre le vaisseau et le mur de météorites
-    handle_sprites_collision(&world->spaceship, &world->mur, world, 1);
+    handle_sprites_collision(&world->spaceship, &world->mur, world, true);
     // Collision entre le vaisseau et la ligne d'arrivée
-    handle_sprites_collision(&world->spaceship, &world->ligne, world, 0);
+    handle_sprites_collision(&world->spaceship, &world->ligne, world, false);
 }
 
 /**
@@ -110,7 +110,7 @@ void handle_events(SDL_Event *event, world_t *world) {
         // Si l'utilisateur a cliqué sur le X de la fenêtre
         if (event->type == SDL_QUIT) {
             // On indique la fin du jeu
-            world->gameover = 1;
+            world->gameover = true;
         }
 
         // si une touche est appuyée
@@ -136,7 +136,7 @@ void handle_events(SDL_Event *event, world_t *world) {
 
             // Quitter (Echap)
             if (event->key.keysym.sym == SDLK_ESCAPE) {
-                world->gameover = 1;
+                world->gameover = true;
             }
         }
     }
@@ -168,9 +168,9 @@ void check_right_boundary(sprite_t *spaceship) {
  * \brief Indique si deux sprites sont en collision
  * \param sp1 Le premier sprite
  * \param sp2 Le deuxième sprite
- * \return 1 s'il y a collision, 0 sinon
+ * \return true s'il y a collision, false sinon
  */
-int sprites_collide(sprite_t *sp1, sprite_t *sp2) {
+bool sprites_collide(sprite_t *sp1, sprite_t *sp2) {
     // Utilisation de la formule du document : |x1 - x2| <= (w1 + w2) / 2 ET |y1 - y2| <= (h1 + h2) / 2
     return (sp1->x - sp2->x) < (sp1->w + sp2->w) / 2 && abs(sp1->y - sp2->y) < (sp1->h + sp2->h) / 2;
 }
@@ -180,15 +180,15 @@ int sprites_collide(sprite_t *sp1, sprite_t *sp2) {
  * \param sp1 Le premier sprite
  * \param sp2 Le deuxième sprite
  * \param world Les données du monde
- * \param make_disappear Si non nul, le premier sprite (sp1) disparaît en cas de collision
+ * \param make_disappear Si vrai, le premier sprite (sp1) disparaît en cas de collision
  */
-void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, int make_disappear) {
+void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, bool make_disappear) {
     // Si les deux sprites entrent en collision
     if (sprites_collide(sp1, sp2)) {
         // Alors la vitesse de déplacement verticale dans le monde devient nulle
         world->speed = 0;
-        if (make_disappear != 0) {
-            sp1->is_visible = 0;
+        if (make_disappear) {
+            sp1->is_visible = false;
         }
     }
 }

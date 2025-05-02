@@ -11,13 +11,14 @@
 
 #include "constants.h"
 #include "sdl2-light.h"
+#include <stdbool.h>
 
 struct sprite_s {
     int x;
     int y;
     int w;
     int h;
-    int is_visible;
+    bool is_visible;
 };
 typedef struct sprite_s sprite_t;
 
@@ -26,11 +27,11 @@ typedef struct sprite_s sprite_t;
  */
 struct world_s {
     sprite_t spaceship;
-    int gameover;   /*!< Champ indiquant si l'on est à la fin du jeu */
+    bool gameover;  /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_t ligne; /*!< La ligne d'arrivée */
     sprite_t mur;
     int speed;
-    int down; /*!< La ligne est en bas */
+    bool down; /*!< La ligne est en bas */
 };
 
 /**
@@ -46,7 +47,7 @@ void init_data(world_t *world);
 
 void clean_data(world_t *world);
 
-int is_game_over(world_t *world);
+bool is_game_over(world_t *world);
 
 void update_data(world_t *world);
 
@@ -56,8 +57,8 @@ void check_left_boundary(sprite_t *spaceship);
 
 void check_right_boundary(sprite_t *spaceship);
 
-int sprites_collide(sprite_t *sp1, sprite_t *sp2);
+bool sprites_collide(sprite_t *sp1, sprite_t *sp2);
 
-void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, int make_disappear);
+void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, bool make_disappear);
 
 #endif
