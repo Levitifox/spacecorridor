@@ -67,6 +67,13 @@ int main(int argc, char **argv) {
         pause(10);
     }
 
+    SDL_Event event;
+    Uint32 end = SDL_GetTicks() + 3000;
+    while (SDL_GetTicks() < end) {
+        while (SDL_PollEvent(&event)) {
+        }
+    }
+
     // nettoyage final
     clean(window, renderer, &resources, &world);
 
