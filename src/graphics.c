@@ -35,7 +35,7 @@ void init_resources(SDL_Renderer *renderer, resources_t *resources) {
     resources->spaceship = load_image("resources/spaceship.png", renderer);
     resources->ligne = load_image("resources/finish_line.png", renderer);
     resources->meteorite = load_image("resources/meteorite.png", renderer);
-    resources->font = load_font("resources/arial.ttf", 14);
+    resources->font = load_font("resources/arial.ttf", 28);
 }
 
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {

@@ -3,11 +3,11 @@
 /**
  * \brief La fonction initialise l'environnement TTF
  */
-
 void init_ttf() {
     if (TTF_Init() == -1) {
         printf("TTF_Init: %s\n", TTF_GetError());
     }
+    SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 }
 
 /**
@@ -16,11 +16,10 @@ void init_ttf() {
  * \param font_size la taille de la police
  * \return la police chargée
  */
-
 TTF_Font *load_font(const char *path, int font_size) {
     TTF_Font *font = TTF_OpenFont(path, font_size);
     if (font == NULL) {
-        fprintf(stderr, "Erreur pendant chargement font: %s\n", SDL_GetError());
+        fprintf(stderr, "Erreur pendant chargement font: %s\n", TTF_GetError());
     }
     return font;
 }
@@ -35,14 +34,13 @@ TTF_Font *load_font(const char *path, int font_size) {
  * \param text le texte à afficher
  * \param font la police
  */
-
 void apply_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *text, TTF_Font *font) {
     SDL_Color color = {255, 0, 255, 255}; // Ajoutez 255 pour le canal alpha
 
-    SDL_Surface *surface = TTF_RenderText_Solid(font, text, color);
-    // printf("FFFFF\n");
+    SDL_Surface *surface = TTF_RenderText_Blended(font, text, color);
 
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_QueryTexture(texture, NULL, NULL, &w, &h);
     SDL_Rect dstrect2 = {x, y, w, h};
     SDL_RenderCopy(renderer, texture, NULL, &dstrect2);
 }
