@@ -10,28 +10,32 @@
 #include "constants.h"
 #include "game.h"
 #include "sdl2-light.h"
+#include "sdl2-ttf-light.h"
 
 /**
- * \brief La fonction nettoie les textures
- * \param textures les textures
+ * \brief La fonction nettoie les ressources
+ * \param resources Les ressources
  */
-void clean_textures(textures_t *textures) {
-    clean_texture(textures->background);
-    clean_texture(textures->spaceship);
-    clean_texture(textures->ligne);
-    clean_texture(textures->meteorite);
+void clean_resources(resources_t *resources) {
+    clean_texture(resources->background);
+    clean_texture(resources->spaceship);
+    clean_texture(resources->ligne);
+    clean_texture(resources->meteorite);
+    clean_font(resources->font);
 }
 
 /**
- * \brief La fonction initialise les textures nécessaires à l'affichage graphique du jeu
- * \param screen la surface correspondant à l'écran de jeu
- * \param textures les textures du jeu
+ * \brief La fonction initialise les ressources nécessaires à l'affichage graphique du jeu
+ * \param renderer le renderer correspondant à l'écran de jeu
+ * \param resources Les ressources du jeu
  */
-void init_textures(SDL_Renderer *renderer, textures_t *textures) {
-    textures->background = load_image("resources/space-background.png", renderer);
-    textures->spaceship = load_image("resources/spaceship.png", renderer);
-    textures->ligne = load_image("resources/finish_line.png", renderer);
-    textures->meteorite = load_image("resources/meteorite.png", renderer);
+void init_resources(SDL_Renderer *renderer, resources_t *resources) {
+    init_ttf();
+    resources->background = load_image("resources/space-background.png", renderer);
+    resources->spaceship = load_image("resources/spaceship.png", renderer);
+    resources->ligne = load_image("resources/finish_line.png", renderer);
+    resources->meteorite = load_image("resources/meteorite.png", renderer);
+    resources->font = load_font("resources/arial.ttf", 14);
 }
 
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {
@@ -99,20 +103,37 @@ void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
  * \param renderer le renderer lié à l'écran de jeu
  * \param world les données du monde
- * \param textures les textures
+ * \param resources les ressources
  */
-void refresh_graphics(SDL_Renderer *renderer, world_t *world, textures_t *textures) {
+void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources) {
     // on vide le renderer
     clear_renderer(renderer);
-    // application des textures dans le renderer
-    apply_background(renderer, textures->background);
-    apply_texture(textures->background, renderer, 0, 0);
-    apply_sprite(renderer, textures->spaceship, &world->spaceship);
-    apply_sprite(renderer, textures->ligne, &world->ligne);
+    // application des ressources dans le renderer
+    apply_background(renderer, resources->background);
+    apply_texture(resources->background, renderer, 0, 0);
+    apply_sprite(renderer, resources->spaceship, &world->spaceship);
+    apply_sprite(renderer, resources->ligne, &world->ligne);
 
-    // afficher les murs uniquement si le jeu n'est pas terminé
+    // afficher les ressources uniquement si le jeu n'est pas terminé
     if (!world->gameover) {
-        apply_walls(renderer, world, textures->meteorite);
+        apply_walls(renderer, world, resources->meteorite);
+    }
+
+    {
+        char timeText[64];
+        sprintf(timeText, "Time: %.2f s", world->time_since_game_start / 1000.0);
+        // Affichage en haut à gauche
+        apply_text(renderer, 10, 10, 150, 30, timeText, resources->font);
+    }
+
+    if (world->gameover) {
+        int center_x = SCREEN_WIDTH / 2 - 75;
+        int center_y = SCREEN_HEIGHT / 2;
+        if (world->has_won) {
+            apply_text(renderer, center_x, center_y, 150, 30, "You won!", resources->font);
+        } else {
+            apply_text(renderer, center_x, center_y, 150, 30, "You lost!", resources->font);
+        }
     }
 
     // Met à jour l'affichage

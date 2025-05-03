@@ -108,20 +108,11 @@ void update_data(world_t *world) {
     }
 
     // Mise à jour de la position de la ligne d'arrivée
-    if (world->down) {
-        // la ligne va vers la vers bas
-        if (world->ligne.y < SCREEN_HEIGHT - SHIP_SIZE * 2) {
-            world->ligne.y = world->ligne.y + world->speed;
-        } else {
-            world->down = false;
-        }
+    if (world->ligne.y < SCREEN_HEIGHT - FINISH_LINE_HEIGHT) {
+        world->ligne.y = world->ligne.y + world->speed;
     } else {
-        // la ligne va vers la vers haut
-        if (world->ligne.y > FINISH_LINE_HEIGHT / 2) {
-            world->ligne.y = world->ligne.y - world->speed;
-        } else {
-            world->down = true;
-        }
+        // Une fois la ligne en bas, on la maintient pour déclencher la collision
+        world->ligne.y = SCREEN_HEIGHT - FINISH_LINE_HEIGHT;
     }
 
     // Mise à jour des murs et vérifications des limites du vaisseau
