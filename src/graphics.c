@@ -35,7 +35,7 @@ void init_resources(SDL_Renderer *renderer, resources_t *resources) {
     resources->spaceship = load_image("resources/spaceship.png", renderer);
     resources->ligne = load_image("resources/finish_line.png", renderer);
     resources->meteorite = load_image("resources/meteorite.png", renderer);
-    resources->font = load_font("resources/arial.ttf", 28);
+    resources->font = load_font("resources/Super_Retro_M54.ttf", 20);
 }
 
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {
@@ -50,10 +50,14 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite
  * \param renderer le renderer
  * \param texture la texture liée au fond
  */
-void apply_background(SDL_Renderer *renderer, SDL_Texture *texture) {
-    if (texture != NULL) {
-        apply_texture(texture, renderer, 0, 0);
-    }
+void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset) {
+    int w, h;
+    SDL_QueryTexture(texture, NULL, NULL, &w, &h);
+    /* Deux copies pour un défilement continu */
+    SDL_Rect dest1 = {0, scroll_offset, w, h};
+    SDL_Rect dest2 = {0, scroll_offset - h, w, h};
+    SDL_RenderCopy(renderer, texture, NULL, &dest1);
+    SDL_RenderCopy(renderer, texture, NULL, &dest2);
 }
 
 /**
@@ -106,11 +110,13 @@ void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
  * \param resources les ressources
  */
 void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources) {
-    // on vide le renderer
     clear_renderer(renderer);
-    // application des ressources dans le renderer
-    apply_background(renderer, resources->background);
-    apply_texture(resources->background, renderer, 0, 0);
+
+    int bg_w, bg_h;
+    SDL_QueryTexture(resources->background, NULL, NULL, &bg_w, &bg_h);
+    int scroll_offset = (world->time_since_game_start / 10) % bg_h;
+    apply_background(renderer, resources->background, scroll_offset);
+
     apply_sprite(renderer, resources->spaceship, &world->spaceship);
     apply_sprite(renderer, resources->ligne, &world->ligne);
 
@@ -119,6 +125,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
         apply_walls(renderer, world, resources->meteorite);
     }
 
+    /* Mise à jour du temps écoulé et affichage */
     {
         char timeText[64];
         sprintf(timeText, "Time: %.2f s", world->time_since_game_start / 1000.0);
@@ -126,6 +133,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
         apply_text(renderer, 10, 10, 150, 30, timeText, resources->font);
     }
 
+    /* Message de fin de partie */
     if (world->gameover) {
         int center_x = SCREEN_WIDTH / 2 - 75;
         int center_y = SCREEN_HEIGHT / 2;

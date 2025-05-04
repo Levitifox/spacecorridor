@@ -33,6 +33,7 @@ void clean(SDL_Window *window, SDL_Renderer *renderer, resources_t *resources, w
  */
 void init(SDL_Window **window, SDL_Renderer **renderer, resources_t *resources, world_t *world) {
     init_sdl(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+    SDL_SetWindowTitle(*window, "Arcade"); // Définir le titre de la fenêtre
     init_data(world);
     init_resources(*renderer, resources);
 }

@@ -35,8 +35,7 @@ TTF_Font *load_font(const char *path, int font_size) {
  * \param font la police
  */
 void apply_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *text, TTF_Font *font) {
-    SDL_Color color = {255, 0, 255, 255}; // Ajoutez 255 pour le canal alpha
-
+    SDL_Color color = {230, 212, 175, 255};
     SDL_Surface *surface = TTF_RenderText_Blended(font, text, color);
 
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
