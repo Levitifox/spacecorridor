@@ -40,6 +40,39 @@ void init(SDL_Window **window, SDL_Renderer **renderer, resources_t *resources, 
 }
 
 /**
+ * \brief Affiche l'écran de démarrage en plein écran pendant une durée donnée
+ * \param renderer le renderer à utiliser
+ * \param image_path chemin de l'image de splash
+ * \param duration_ms durée en millisecondes
+ */
+void show_splash_screen(SDL_Renderer *renderer, const char *image_path, int duration_ms) {
+    SDL_Texture *splash = load_image(image_path, renderer);
+
+    // Initialisation de l'audio pour le splash
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
+        fprintf(stderr, "Mix_OpenAudio error: %s\n", Mix_GetError());
+    }
+    Mix_Chunk *splash_sound = Mix_LoadWAV("resources/splash_screen.wav");
+    if (splash_sound) {
+        Mix_PlayChannel(-1, splash_sound, 0);
+    }
+
+    if (splash) {
+        clear_renderer(renderer);
+        SDL_Rect dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}; // plein écran
+        SDL_RenderCopy(renderer, splash, NULL, &dest);
+        update_screen(renderer);
+        pause(duration_ms);
+        clean_texture(splash);
+    }
+
+    if (splash_sound) {
+        Mix_FreeChunk(splash_sound);
+    }
+    Mix_CloseAudio();
+}
+
+/**
  * \brief programme principal qui implémente la boucle du jeu
  */
 int main(int argc, char **argv) {
@@ -53,6 +86,9 @@ int main(int argc, char **argv) {
 
     // initialisation du jeu
     init(&window, &renderer, &resources, &world);
+
+    // Affichage de l'écran de démarrage
+    show_splash_screen(renderer, "resources/splash_screen.png", 3000);
 
     while (!is_game_over(&world)) { // tant que le jeu n'est pas fini
         SDL_Event event;
