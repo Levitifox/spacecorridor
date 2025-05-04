@@ -155,29 +155,22 @@ void handle_events(SDL_Event *event, world_t *world) {
             // On indique la fin du jeu
             world->gameover = true;
         }
-
-        // si une touche est appuyée
-        if (event->type == SDL_KEYDOWN) {
-            // Gestion des mouvements
-            if (event->key.keysym.sym == SDLK_q || event->key.keysym.sym == SDLK_a || event->key.keysym.sym == SDLK_LEFT) {
-                world->spaceship.x = world->spaceship.x - MOVING_STEP;
-            }
-            if (event->key.keysym.sym == SDLK_d || event->key.keysym.sym == SDLK_RIGHT) {
-                world->spaceship.x = world->spaceship.x + MOVING_STEP;
-            }
-            if (event->key.keysym.sym == SDLK_s || event->key.keysym.sym == SDLK_DOWN) {
-                world->spaceship.y = world->spaceship.y + MOVING_STEP;
-            }
-            if (event->key.keysym.sym == SDLK_z || event->key.keysym.sym == SDLK_w || event->key.keysym.sym == SDLK_UP) {
-                world->spaceship.y = world->spaceship.y - MOVING_STEP;
-            }
-
-            // Quitter (Echap)
-            if (event->key.keysym.sym == SDLK_ESCAPE) {
-                world->gameover = true;
-            }
+        // Quitter (Echap)
+        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_ESCAPE) {
+            world->gameover = true;
         }
     }
+
+    // Gestion des mouvements
+    const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+    if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q])
+        world->spaceship.x = world->spaceship.x - MOVING_STEP;
+    if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D])
+        world->spaceship.x = world->spaceship.x + MOVING_STEP;
+    if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z])
+        world->spaceship.y = world->spaceship.y - MOVING_STEP;
+    if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
+        world->spaceship.y = world->spaceship.y + MOVING_STEP;
 }
 
 /**

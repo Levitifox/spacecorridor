@@ -40,7 +40,7 @@
 /**
  * \brief Pas de déplacement horizontal du vaisseau
  */
-#define MOVING_STEP 10
+#define MOVING_STEP 2
 
 /**
  * \brief Vitesse initiale de déplacement vertical des éléments du jeu
