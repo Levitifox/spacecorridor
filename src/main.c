@@ -10,6 +10,7 @@
 #include "game.h"
 #include "graphics.h"
 #include "sdl2-light.h"
+#include <SDL_mixer.h>
 
 /**
  * \brief fonction qui nettoie le jeu: nettoyage de la partie graphique (SDL), nettoyage des textures, nettoyage des données
@@ -48,6 +49,7 @@ int main(int argc, char **argv) {
     resources_t resources;
     SDL_Renderer *renderer;
     SDL_Window *window;
+    Mix_Chunk *sound = NULL;
 
     // initialisation du jeu
     init(&window, &renderer, &resources, &world);
@@ -68,6 +70,11 @@ int main(int argc, char **argv) {
         pause(10);
     }
 
+    // Jouer le son après fin du jeu
+    Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+    sound = world.has_won ? Mix_LoadWAV("resources/win_sound.wav") : Mix_LoadWAV("resources/loss_sound.wav");
+    Mix_PlayChannel(-1, sound, 0);
+
     SDL_Event event;
     Uint32 end = SDL_GetTicks() + 3000;
     while (SDL_GetTicks() < end) {
@@ -77,6 +84,8 @@ int main(int argc, char **argv) {
 
     // nettoyage final
     clean(window, renderer, &resources, &world);
+    Mix_FreeChunk(sound);
+    Mix_CloseAudio();
 
     return 0;
 }
