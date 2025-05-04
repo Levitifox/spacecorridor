@@ -27,9 +27,10 @@ typedef struct sprite_s sprite_t;
  */
 struct world_s {
     sprite_t spaceship;
-    bool gameover;     /*!< Champ indiquant si l'on est à la fin du jeu */
-    sprite_t ligne;    /*!< La ligne d'arrivée */
-    sprite_t murs[10]; /*!< Tableau de murs de météorites */
+    bool gameover;  /*!< Champ indiquant si l'on est à la fin du jeu */
+    sprite_t ligne; /*!< La ligne d'arrivée */
+    size_t murs_count;
+    sprite_t *murs; /*!< Tableau de murs de météorites */
     int speed;
     bool down;                    /*!< La ligne est en bas */
     Uint64 start_time;            /*!< Temps de début du jeu */

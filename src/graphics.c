@@ -84,7 +84,7 @@ void apply_wall(int h, int w, SDL_Renderer *renderer, SDL_Texture *texture, worl
  * \param texture La texture des murs
  */
 void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
-    for (int i = 0; i < 6; i++) {
+    for (size_t i = 0; i < world->murs_count; i++) {
         // calculer le nombre de météorites à dessiner horizontalement et verticalement
         int num_meteos_x = world->murs[i].w / METEORITE_SIZE;
         int num_meteos_y = world->murs[i].h / METEORITE_SIZE;
@@ -147,4 +147,3 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
     // Met à jour l'affichage
     update_screen(renderer);
 }
-`

@@ -54,7 +54,7 @@ void init_data(world_t *world) {
 void init_walls(world_t *world) {
     // Caractéristiques des murs
     // clang-format off
-    int wall_positions[6][4] = {
+    int wall_positions[][4] = {
         {48, 0, 96, 192}, // x, y, largeur, hauteur pour le mur
         {252, 0, 96, 192},
         {16, -352, 32, 160},
@@ -64,8 +64,10 @@ void init_walls(world_t *world) {
     };
     // clang-format on
 
+    world->murs_count = sizeof wall_positions / sizeof wall_positions[0];
+    world->murs = malloc(sizeof(sprite_t) * world->murs_count);
     // Initialisation des murs
-    for (int i = 0; i < 6; i++) {
+    for (size_t i = 0; i < world->murs_count; i++) {
         init_sprite(&world->murs[i], wall_positions[i][0], wall_positions[i][1], wall_positions[i][2], wall_positions[i][3]);
         print_sprite("mur", &world->murs[i]);
     }
@@ -76,7 +78,7 @@ void init_walls(world_t *world) {
  * \param world les données du monde
  */
 void clean_data(world_t *world) {
-    (void)world;
+    free(world->murs);
 }
 
 /**
@@ -121,7 +123,7 @@ void update_data(world_t *world) {
     check_right_boundary(&world->spaceship);
 
     // Collision entre le vaisseau et le mur de météorites
-    for (int i = 0; i < 6; i++) {
+    for (size_t i = 0; i < world->murs_count; i++) {
         if (sprites_collide(&world->spaceship, &world->murs[i])) {
             world->gameover = true;
             printf("You lost!\n");
@@ -135,7 +137,7 @@ void update_data(world_t *world) {
  * \param world Les données du monde
  */
 void update_walls(world_t *world) {
-    for (int i = 0; i < 6; i++) {
+    for (size_t i = 0; i < world->murs_count; i++) {
         // Mettre à jour uniquement si le mur est visible
         if (world->murs[i].is_visible) {
             world->murs[i].y += world->speed;
