@@ -22,3 +22,28 @@ executable(
     dependencies: [sdl2, sdl2_image, sdl2_ttf, sdl2_mixer],
     install: true,
 )
+
+doxygen = find_program('doxygen', required: false)
+
+if doxygen.found()
+    doxyfile = configure_file(
+        input: 'Doxyfile.in',
+        output: 'Doxyfile',
+        configuration: {
+            'SOURCE_DIR': meson.current_source_dir(),
+            'BUILD_DIR': meson.current_build_dir(),
+        },
+    )
+
+    custom_target(
+        'doxygen',
+        input: doxyfile,
+        output: 'docs',
+        command: [doxygen, '@INPUT@'],
+        build_by_default: false,
+        install: false,
+        console: true,
+    )
+else
+    message('Doxygen not found, skipping `doxygen` target.')
+endif

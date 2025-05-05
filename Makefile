@@ -18,7 +18,10 @@ dist: build
 	cp builddir/spacecorridor.exe dist/
 	ldd dist/spacecorridor.exe | grep "mingw64/bin/" | sed -E 's/^[^>]*=> ([^ ]+) .*/\1/' | xargs -I{} cp {} dist/
 
+doxygen: builddir
+	meson compile -C builddir doxygen
+
 clean:
 	rm -rf builddir dist
 
-.PHONY: build run fmt dist clean
+.PHONY: build run fmt dist doxygen clean

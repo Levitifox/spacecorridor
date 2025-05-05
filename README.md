@@ -41,3 +41,10 @@ To make a distribution for Windows, run:
 ```
 make dist
 ```
+
+## Generating documentation
+
+To generate the documentation Web pages, run (the output will be in `builddir/doxygen/html/files.html`):
+```
+make doxygen
+```
