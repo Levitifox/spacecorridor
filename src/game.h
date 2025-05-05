@@ -14,10 +14,10 @@
 #include <stdbool.h>
 
 struct sprite_s {
-    int x;
-    int y;
-    int w;
-    int h;
+    double x;
+    double y;
+    double w;
+    double h;
     bool is_visible;
 };
 typedef struct sprite_s sprite_t;
@@ -30,11 +30,13 @@ struct world_s {
     bool gameover;  /*!< Champ indiquant si l'on est à la fin du jeu */
     sprite_t ligne; /*!< La ligne d'arrivée */
     size_t murs_count;
-    sprite_t *murs; /*!< Tableau de murs de météorites */
-    int speed;
+    sprite_t *murs;               /*!< Tableau de murs de météorites */
+    double speed;                 /*!< Vitesse du déplacement dans le jeu */
     Uint64 start_time;            /*!< Temps de début du jeu */
-    Uint64 time_since_game_start; /*!< Le temps écoulé */
-    bool has_won;
+    Uint64 time_since_game_start; /*!< Temps écoulé depuis le début du jeu */
+    Uint64 last_frame_time;       /*!< Temps de la dernière frame rendue */
+    Uint64 time_since_last_frame; /*!< Temps écoulé depuis la dernière frame */
+    bool has_won;                 /*!< Indique si le joueur a gagné */
 };
 
 /**
@@ -42,7 +44,7 @@ struct world_s {
  */
 typedef struct world_s world_t;
 
-void init_sprite(sprite_t *sprite, int x, int y, int w, int h);
+void init_sprite(sprite_t *sprite, double x, double y, double w, double h);
 
 void print_sprite(char *name, sprite_t *sprite);
 

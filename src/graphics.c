@@ -67,8 +67,8 @@ void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_o
  * \param texture la texture liée au fond
  */
 void apply_wall(int h, int w, SDL_Renderer *renderer, SDL_Texture *texture, world_t *world) {
-    int px = world->murs->x;
-    int py = world->murs->y;
+    double px = world->murs->x;
+    double py = world->murs->y;
     int meteo = 192;
     for (int i = 0; i < h; i++) {
         for (int j = 0; j < w; j++) {
@@ -90,8 +90,8 @@ void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
         int num_meteos_y = world->murs[i].h / METEORITE_SIZE;
 
         // calculer les positions x et y de départ des météorites
-        int start_x = world->murs[i].x - world->murs[i].w / 2;
-        int start_y = world->murs[i].y - world->murs[i].h / 2;
+        double start_x = world->murs[i].x - world->murs[i].w / 2;
+        double start_y = world->murs[i].y - world->murs[i].h / 2;
 
         // dessine les météorites
         for (int j = 0; j < num_meteos_y; j++) {
@@ -114,7 +114,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
 
     int bg_w, bg_h;
     SDL_QueryTexture(resources->background, NULL, NULL, &bg_w, &bg_h);
-    int scroll_offset = (world->time_since_game_start / 10) % bg_h;
+    int scroll_offset = (int)(world->time_since_game_start * BACKGROUND_SPEED) % bg_h;
     apply_background(renderer, resources->background, scroll_offset);
 
     apply_sprite(renderer, resources->spaceship, &world->spaceship);

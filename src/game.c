@@ -10,7 +10,7 @@
 #include "constants.h"
 #include "sdl2-light.h"
 
-void init_sprite(sprite_t *sprite, int x, int y, int w, int h) {
+void init_sprite(sprite_t *sprite, double x, double y, double w, double h) {
     sprite->x = x;
     sprite->y = y;
     sprite->w = w;
@@ -19,7 +19,7 @@ void init_sprite(sprite_t *sprite, int x, int y, int w, int h) {
 }
 
 void print_sprite(char *name, sprite_t *sprite) {
-    printf("Sprite \"%s\" : %dx%d+%d+%d\n", name, sprite->w, sprite->h, sprite->x, sprite->y);
+    printf("Sprite \"%s\" : %fx%f+%f+%f\n", name, sprite->w, sprite->h, sprite->x, sprite->y);
 }
 
 /**
@@ -31,6 +31,7 @@ void init_data(world_t *world) {
     world->gameover = false;
     world->speed = INITIAL_SPEED;
     world->start_time = SDL_GetTicks64();
+    world->last_frame_time = SDL_GetTicks64();
     world->has_won = false;
 
     int ship_x = SCREEN_WIDTH / 2;
@@ -95,6 +96,8 @@ bool is_game_over(world_t *world) {
  */
 void update_data(world_t *world) {
     world->time_since_game_start = SDL_GetTicks64() - world->start_time;
+    world->time_since_last_frame = SDL_GetTicks64() - world->last_frame_time;
+    world->last_frame_time = SDL_GetTicks64();
 
     if (world->gameover) {
         return;
@@ -110,7 +113,7 @@ void update_data(world_t *world) {
 
     // Mise à jour de la position de la ligne d'arrivée
     if (world->ligne.y < SCREEN_HEIGHT - FINISH_LINE_HEIGHT) {
-        world->ligne.y = world->ligne.y + world->speed;
+        world->ligne.y += world->speed * world->time_since_last_frame;
     } else {
         // Une fois la ligne en bas, on la maintient pour déclencher la collision
         world->ligne.y = SCREEN_HEIGHT - FINISH_LINE_HEIGHT;
@@ -139,7 +142,7 @@ void update_walls(world_t *world) {
     for (size_t i = 0; i < world->murs_count; i++) {
         // Mettre à jour uniquement si le mur est visible
         if (world->murs[i].is_visible) {
-            world->murs[i].y += world->speed;
+            world->murs[i].y += world->speed * world->time_since_last_frame;
         }
     }
 }
@@ -164,14 +167,18 @@ void handle_events(SDL_Event *event, world_t *world) {
 
     // Gestion des mouvements
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-    if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q])
-        world->spaceship.x = world->spaceship.x - MOVING_STEP;
-    if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D])
-        world->spaceship.x = world->spaceship.x + MOVING_STEP;
-    if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z])
-        world->spaceship.y = world->spaceship.y - MOVING_STEP;
-    if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S])
-        world->spaceship.y = world->spaceship.y + MOVING_STEP;
+    if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q]) {
+        world->spaceship.x -= MOVING_STEP * world->time_since_last_frame;
+    }
+    if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D]) {
+        world->spaceship.x += MOVING_STEP * world->time_since_last_frame;
+    }
+    if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z]) {
+        world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
+    }
+    if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
+        world->spaceship.y += MOVING_STEP * world->time_since_last_frame;
+    }
 }
 
 /**

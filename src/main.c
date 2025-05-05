@@ -30,12 +30,10 @@ void clean(SDL_Window *window, SDL_Renderer *renderer, resources_t *resources, w
  * \param window la fenêtre du jeu
  * \param renderer le renderer
  * \param resources les ressources
- * \param world le monde
  */
-void init(SDL_Window **window, SDL_Renderer **renderer, resources_t *resources, world_t *world) {
+void init(SDL_Window **window, SDL_Renderer **renderer, resources_t *resources) {
     init_sdl(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
     SDL_SetWindowTitle(*window, "Arcade"); // Définir le titre de la fenêtre
-    init_data(world);
     init_resources(*renderer, resources);
 }
 
@@ -85,25 +83,29 @@ int main(int argc, char **argv) {
     Mix_Chunk *sound = NULL;
 
     // initialisation du jeu
-    init(&window, &renderer, &resources, &world);
+    init(&window, &renderer, &resources);
 
     // Affichage de l'écran de démarrage
     show_splash_screen(renderer, "resources/splash_screen.png", 3000);
 
+    init_data(&world);
     while (!is_game_over(&world)) { // tant que le jeu n'est pas fini
         SDL_Event event;
-
-        // gestion des évènements
-        handle_events(&event, &world);
 
         // mise à jour des données liée à la physique du monde
         update_data(&world);
 
+        // gestion des évènements
+        handle_events(&event, &world);
+
         // rafraichissement de l'écran
         refresh_graphics(renderer, &world, &resources);
 
-        // pause de 10 ms pour controler la vitesse de rafraichissement
-        pause(10);
+        Uint64 now_time = SDL_GetTicks64();
+        Uint64 next_frame_time = world.last_frame_time + 1000 / MAX_FPS;
+        if (next_frame_time > now_time) {
+            pause(next_frame_time - now_time);
+        }
     }
 
     // Jouer le son après fin du jeu

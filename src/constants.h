@@ -13,6 +13,11 @@
 #define MIN(a, b) ((a) <= (b) ? (a) : (b))
 
 /**
+ * \brief Nombre maximal de frames par seconde
+ */
+#define MAX_FPS 240
+
+/**
  * \brief Largeur de l'écran de jeu
  */
 #define SCREEN_WIDTH 300
@@ -38,13 +43,18 @@
 #define FINISH_LINE_HEIGHT 20
 
 /**
- * \brief Pas de déplacement horizontal du vaisseau
+ * \brief Vitesse de déplacement horizontal du vaisseau
  */
-#define MOVING_STEP 2
+#define MOVING_STEP 0.125
 
 /**
  * \brief Vitesse initiale de déplacement vertical des éléments du jeu
  */
-#define INITIAL_SPEED 2
+#define INITIAL_SPEED 0.125
+
+/**
+ * \brief Vitesse de défilement de l'arrière-plan
+ */
+#define BACKGROUND_SPEED 0.1
 
 #endif
