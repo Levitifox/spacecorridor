@@ -5,7 +5,7 @@ builddir:
 	meson setup builddir
 
 run: build
-	./builddir/arcade
+	./builddir/spacecorridor
 
 fmt:
 	meson format -ir

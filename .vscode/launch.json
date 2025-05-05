@@ -9,7 +9,7 @@
       "stopAtEntry": false,
       "externalConsole": true,
       "cwd": "${workspaceFolder}/src",
-      "program": "${workspaceFolder}/builddir/arcade.exe",
+      "program": "${workspaceFolder}/builddir/spacecorridor.exe",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [
