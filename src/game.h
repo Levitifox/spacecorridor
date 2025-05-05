@@ -32,7 +32,6 @@ struct world_s {
     size_t murs_count;
     sprite_t *murs; /*!< Tableau de murs de météorites */
     int speed;
-    bool down;                    /*!< La ligne est en bas */
     Uint64 start_time;            /*!< Temps de début du jeu */
     Uint64 time_since_game_start; /*!< Le temps écoulé */
     bool has_won;

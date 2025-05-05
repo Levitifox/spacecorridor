@@ -30,7 +30,6 @@ void init_data(world_t *world) {
     // on n'est pas à la fin du jeu
     world->gameover = false;
     world->speed = INITIAL_SPEED;
-    world->down = true;
     world->start_time = SDL_GetTicks64();
     world->has_won = false;
 
