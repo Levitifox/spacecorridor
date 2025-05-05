@@ -34,3 +34,10 @@ Run the `./builddir/spacecorridor` executable, or use:
 ```sh
 make run
 ```
+
+## Packaging
+
+To make a distribution for Windows, run:
+```
+make dist
+```

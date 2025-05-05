@@ -1,4 +1,9 @@
-project('spacecorridor', 'c', version: '0.1', default_options: ['warning_level=3'])
+project(
+    'spacecorridor',
+    'c',
+    version: '0.1',
+    default_options: ['warning_level=3'],
+)
 
 sdl2 = dependency('sdl2', required: true)
 sdl2_image = dependency('sdl2_image', required: true)

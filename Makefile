@@ -11,7 +11,14 @@ fmt:
 	meson format -ir
 	find src -iname '*.h' -o -iname '*.c' | xargs clang-format -i
 
-clean:
-	rm -rf builddir
+dist: build
+	rm -rf dist
+	mkdir -p dist
+	cp -r resources dist
+	cp builddir/spacecorridor.exe dist/
+	ldd dist/spacecorridor.exe | grep "mingw64/bin/" | sed -E 's/^[^>]*=> ([^ ]+) .*/\1/' | xargs -I{} cp {} dist/
 
-.PHONY: build run clean
+clean:
+	rm -rf builddir dist
+
+.PHONY: build run fmt dist clean
