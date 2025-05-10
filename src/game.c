@@ -19,7 +19,7 @@ void init_sprite(sprite_t *sprite, double x, double y, double w, double h) {
 }
 
 void print_sprite(char *name, sprite_t *sprite) {
-    printf("Sprite \"%s\" : %fx%f+%f+%f\n", name, sprite->w, sprite->h, sprite->x, sprite->y);
+    printf("Sprite \"%s\" : %gx%g+%g+%g\n", name, sprite->w, sprite->h, sprite->x, sprite->y);
 }
 
 /**
