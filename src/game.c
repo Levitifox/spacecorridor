@@ -33,6 +33,7 @@ void init_data(world_t *world) {
     world->start_time = SDL_GetTicks64();
     world->last_frame_time = SDL_GetTicks64();
     world->has_won = false;
+    world->invisible = false;
 
     int ship_x = SCREEN_WIDTH / 2;
     int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
@@ -126,10 +127,13 @@ void update_data(world_t *world) {
 
     // Collision entre le vaisseau et le mur de météorites
     for (size_t i = 0; i < world->murs_count; i++) {
-        if (sprites_collide(&world->spaceship, &world->murs[i])) {
-            world->gameover = true;
-            printf("You lost!\n");
-            return;
+        // Si on appuie sur I il devient invisible
+        if (world->invisible == false) {
+            if (sprites_collide(&world->spaceship, &world->murs[i])) {
+                world->gameover = true;
+                printf("You lost!\n");
+                return;
+            }
         }
     }
 }
@@ -178,6 +182,9 @@ void handle_events(SDL_Event *event, world_t *world) {
     }
     if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
         world->spaceship.y += MOVING_STEP * world->time_since_last_frame;
+    }
+    if (keystate[SDL_SCANCODE_I]) {
+        world->invisible = !world->invisible;
     }
 }
 
