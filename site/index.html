@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="fr">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Spacecorridor — Documentation</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <div class="sidebar">
+            <nav>
+                <ul>
+                    <li><a href="#introduction">Introduction</a></li>
+                    <li><a href="#auteurs">Équipe & Contexte</a></li>
+                    <li><a href="#description">Fonctionnement du jeu</a></li>
+                    <li><a href="#structure">Structure du projet</a></li>
+                    <li><a href="#architecture">Architecture</a></li>
+                    <li><a href="#problemes">Problèmes & Solutions</a></li>
+                    <li><a href="#metrologie">Métrologie</a></li>
+                    <li><a href="#documentation">Documentation</a></li>
+                </ul>
+            </nav>
+        </div>
+
+        <div class="main-content">
+            <h2 id="introduction" class="first-element">Introduction</h2>
+            <p>
+                Le projet <strong>Spacecorridor</strong> est un mini-jeu académique développé en C. Il a été réalisé dans le cadre du module universitaire
+                Projet de synthèse.
+            </p>
+            <p>Les objectifs du projet sont :</p>
+            <ul>
+                <li>Se familiariser avec le développement d'un jeu vidéo en C</li>
+                <li>Prendre en main la bibliothèque SDL2 pour la gestion des graphismes, du texte et des entrées utilisateur</li>
+                <li>Appliquer des bonnes pratiques de développement, notamment l'organisation du code, les tests et la documentation (Doxygen)</li>
+                <li>Utiliser Git pour la gestion de versions, avec un historique clair et régulier</li>
+                <li>Travailler efficacement en binôme, en assurant une répartition équitable des tâches</li>
+            </ul>
+            <img src="code.svg" alt="`update_walls` function" class="code" />
+
+            <h2 id="auteurs">Auteurs et informations pédagogiques</h2>
+            <ul>
+                <li><strong>Auteurs</strong> : DANILKIN Artem, RUSCUK Emre</li>
+                <li><strong>Groupe</strong> : 3.1</li>
+                <li><strong>Année</strong> : 1<sup>ère</sup> Licence, 2<sup>ème</sup> semestre</li>
+                <li><strong>Université</strong> : Université de Lorraine, Faculté des Sciences et Technologies</li>
+                <li><strong>Module</strong> : Projet de synthèse</li>
+                <li><strong>Enseignant</strong> : SOUMIER Julien</li>
+            </ul>
+
+            <h2 id="description">Description détaillée du jeu</h2>
+            <div class="description-block">
+                <div class="description-content">
+                    <p>
+                        <strong>Spacecorridor</strong> est un « runner » spatial : le joueur pilote un vaisseau en vue de dessus, évoluant automatiquement vers
+                        le haut dans un couloir préétabli.
+                    </p>
+                    <ul>
+                        <li><strong>Objectif</strong> : éviter des météorites et atteindre la ligne d'arrivée aussi rapidement que possible.</li>
+                        <li>
+                            <strong>Commandes</strong> :
+                            <ul>
+                                <li>WASD (QWERTY) / ZQSD (AZERTY) ou flèches ↑ ↓ ← → pour déplacer le vaisseau</li>
+                                <li>Échap pour quitter le jeu</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Affichage</strong> :
+                            <ul>
+                                <li>Temps écoulé depuis le début du niveau, affiché en haut à droite</li>
+                                <li>Fond avec effet de parallaxe pour un rendu visuel dynamique</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Son</strong> :
+                            <ul>
+                                <li>Musique lors de l'écran de démarrage (splash screen)</li>
+                                <li>Effet sonore de collision à la mort</li>
+                                <li>Effet sonore de victoire à la fin</li>
+                            </ul>
+                        </li>
+                        <li>
+                            <strong>Visuel</strong> :
+                            <ul>
+                                <li>Univers spatial rétro avec fond étoilé, blocs de météorites formant des murs, et vaisseau stylisé</li>
+                                <li>Contraste clair entre éléments et décor pour une lisibilité optimale</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+                <img src="screenshot.png" alt="screenshot" class="img" />
+            </div>
+
+            <h2 id="structure">Structure du dépôt et description des fichiers</h2>
+            <pre>
+spacecorridor/
+├─ resources/           # tous les assets (images, polices, sons)
+├─ site/                # site Web avec de la documentation
+├─ src/                 # code source C (logique de jeu, rendu, entrée, wrappers SDL2)
+├─ .clang-format        # règles de style du code
+├─ .gitignore           # fichiers et dossiers exclus du suivi Git
+├─ .prettierrc.json     # règles de style du site
+├─ Doxyfile.in          # template de configuration Doxygen
+├─ infos.txt            # métadonnées du projet (auteurs, groupe)
+├─ Makefile             # cibles : build, run, dist, doxygen
+├─ meson.build          # configuration du build multiplateforme (Meson)
+└─ README.md            # guide d'installation et d'utilisation</pre
+            >
+
+            <h2 id="architecture">Architecture logicielle et formules clés</h2>
+            <h3>Initialisation et splash (<code>src/main.c</code>)</h3>
+            <ul>
+                <li>
+                    <code>init(window, renderer, resources)</code> : configuration de SDL2, création de la fenêtre et du renderer, chargement des ressources.
+                </li>
+                <li>
+                    <code>show_splash_screen(renderer, "resources/splash_screen.png", 3000)</code> : affichage plein écran du splash + lecture du son associé,
+                    pause de 3 s.
+                </li>
+                <li><code>init_data(&world)</code> : état initial du monde (position du vaisseau, génération de la trajectoire et du timer).</li>
+            </ul>
+
+            <h3>Boucle de jeu principale (<code>src/main.c</code>)</h3>
+            <ol>
+                <li>
+                    <strong>update_data(&world)</strong> :
+                    <ul>
+                        <li>le vaisseau avance automatiquement vers le haut,</li>
+                        <li>les météorites défilent selon leur trajectoire prédéfinie,</li>
+                        <li>mise à jour du timer (temps écoulé depuis le début du niveau).</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>handle_events(&event, &world)</strong> :
+                    <ul>
+                        <li>lecture de <code>SDL_PollEvent</code>,</li>
+                        <li>changement d'état en réaction.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>refresh_graphics(renderer, &world, &resources)</strong> :
+                    <ul>
+                        <li>rendu du fond avec effet de parallaxe (deux calques décalés),</li>
+                        <li>dessin du vaisseau, des météorites et de la ligne d'arrivée,</li>
+                        <li>affichage du temps écoulé en haut à droite.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Limitation du framerate</strong> :
+                    <p>
+                        On calcule T<sub>next</sub> = T<sub>last</sub> + 1000 / MAX_FPS, Δ = max(0, T<sub>next</sub> - T<sub>now</sub>) où T = SDL_GetTicks64()
+                        et on attends Δ ms après un frame pour maintenir la fréquence cible.
+                    </p>
+                </li>
+            </ol>
+
+            <h3>Audio</h3>
+            <ul>
+                <li>SDL2_mixer pour les sons de splash, de collision et de victoire,</li>
+                <li>ouverture et fermeture de l'audio encadrant l'utilisation des <code>Mix_Chunk</code>.</li>
+            </ul>
+
+            <h3>Nettoyage (<code>src/main.c</code>)</h3>
+            <p>
+                <code>clean(window, renderer, resources, &world)</code> : libération de toutes les textures, du mixeur audio, du renderer et de la fenêtre SDL2.
+            </p>
+            <img src="uml_diagram.svg" alt="UML Diagram" class="svg" />
+
+            <h2 id="problemes">Problèmes rencontrés et solutions détaillées</h2>
+            <ul>
+                <li>
+                    <p>
+                        Texte SDL2_ttf rendu en basse résolution : absence de <code>TTF_Init()</code> et usage de <code>TTF_RenderText_Solid()</code>.
+                        Correction : ajout de <code>TTF_Init()</code> et passage à <code>TTF_RenderUTF8_Blended()</code> pour un rendu antialiasé.
+                    </p>
+                    <aside>
+                        Commit : Fix font rendering
+                        <a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/a73260804775b2007b35bc4ddb21770116502783"
+                            >a732608</a
+                        >
+                    </aside>
+                </li>
+                <li>
+                    <p>
+                        Latence clavier : traitement séquentiel trop lourd. Correction : suppression des délais, gestion de <code>SDL_PollEvent</code> revue
+                        pour traiter tous les événements chaque frame.
+                    </p>
+                    <aside>
+                        Commit : Fix control lag
+                        <a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/b3e1c24043a27cd4d84e353d4783dfadcc7d5ef6"
+                            >b3e1c24</a
+                        >
+                    </aside>
+                </li>
+                <li>
+                    <p>
+                        Vitesse liée au taux de rafraîchissement : déplacement plus rapide à 165 Hz qu'à 60 Hz. Correction : ajout de
+                        <code>last_frame_time</code> et <code>time_since_last_frame</code> (via <code>SDL_GetTicks64()</code>) dans <code>world_t</code>, et
+                        multiplication des pas de déplacement par <code>time_since_last_frame</code>. Ajustement des constantes de vitesse dans
+                        <code>src/constants.h</code>.
+                    </p>
+                    <aside>
+                        Commit : Make movement speed independent of the FPS
+                        <a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/4f4b525c1fe33082ccdafaa78399777e74a8d678"
+                            >4f4b525</a
+                        >
+                    </aside>
+                </li>
+                <li>
+                    <p>Sprite du vaisseau mal centré : ajustement des calculs de <code>dst.x</code> et <code>dst.y</code> pour un centrage précis.</p>
+                    <aside>
+                        Commit : Fix sprite centering
+                        <a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/36e064e193930fefae118cb437576cf3cedb89a4"
+                            >36e064e</a
+                        >
+                    </aside>
+                </li>
+                <li>
+                    <p>
+                        Décalage entre affichage et son du splash screen : préchargement des <code>Mix_Chunk</code> et synchronisation de
+                        <code>Mix_PlayChannel</code> avec le rendu graphique. Sons de victoire et collision ajoutés pour renforcer le feedback.
+                    </p>
+                    <aside>
+                        Commit : Added splash screen, changed sounds and font
+                        <a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/63b13e84b2015365c015ce62afc7222386c47b6f"
+                            >63b13e8</a
+                        >
+                    </aside>
+                </li>
+                <li>
+                    <p>
+                        Limitation d'un tableau statique de murs : migration vers allocation dynamique (<code>malloc</code>) pour gérer un nombre variable
+                        d'obstacles et améliorer la gestion mémoire.
+                    </p>
+                    <aside>
+                        Commit : Use malloc for murs instead of a fixed array
+                        <a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/63b13e84b2015365c015ce62afc7222386c47b6f"
+                            >63b13e8</a
+                        >
+                    </aside>
+                </li>
+            </ul>
+
+            <h2 id="metrologie">Métrologie et performances</h2>
+            <ul>
+                <li><strong>Nombre total de commits</strong> : 34</li>
+                <li>
+                    <strong>Répartition des langages</strong> :
+                    <ul>
+                        <li>C : ~94 % (≈ 500 lignes)</li>
+                        <li>Meson : ~3,8 %</li>
+                        <li>Makefile : ~1,8 %</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Performances</strong> (test sur Windows 11, Intel Core i7-12700KF, NVIDIA RTX 4070) :
+                    <ul>
+                        <li>FPS moyen stable à 240 en mode plein écran (1920x1080)</li>
+                        <li>Taille de l'exécutable Windows et libraries : ~50.4 MiB</li>
+                    </ul>
+                </li>
+            </ul>
+
+            <h2 id="documentation">Documentation générée</h2>
+            <p>
+                La documentation complète (commentaires Doxygen) est accessible ici :
+                <a href="../builddir/doxygen/html/files.html">builddir/doxygen/html/files.html</a>.
+            </p>
+        </div>
+    </body>
+</html>

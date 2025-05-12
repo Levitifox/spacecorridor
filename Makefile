@@ -10,6 +10,7 @@ run: build
 fmt:
 	meson format -ir
 	find src -iname '*.h' -o -iname '*.c' | xargs clang-format -i
+	-npx prettier -w site
 
 dist: build
 	rm -rf dist
