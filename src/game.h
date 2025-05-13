@@ -38,6 +38,7 @@ struct world_s {
     Uint64 time_since_last_frame; /*!< Temps écoulé depuis la dernière frame */
     bool has_won;                 /*!< Indique si le joueur a gagné */
     bool invisible;               /*!< Indique si le joueur est dans un mode invisible */
+    int current_level;            /*!< Niveau actuel du joueur */
 };
 
 /**

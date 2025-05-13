@@ -8,6 +8,7 @@
 
 #include "game.h"
 #include "constants.h"
+#include "level.h"
 #include "sdl2-light.h"
 
 void init_sprite(sprite_t *sprite, double x, double y, double w, double h) {
@@ -27,13 +28,13 @@ void print_sprite(char *name, sprite_t *sprite) {
  * \param world les données du monde
  */
 void init_data(world_t *world) {
-    // on n'est pas à la fin du jeu
     world->gameover = false;
     world->speed = INITIAL_SPEED;
     world->start_time = SDL_GetTicks64();
     world->last_frame_time = SDL_GetTicks64();
     world->has_won = false;
     world->invisible = false;
+    world->current_level = 1;
 
     int ship_x = SCREEN_WIDTH / 2;
     int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
@@ -41,37 +42,8 @@ void init_data(world_t *world) {
     init_sprite(&world->spaceship, ship_x, ship_y, SHIP_SIZE, SHIP_SIZE);
     print_sprite("spaceship", &world->spaceship);
 
-    init_sprite(&world->ligne, SCREEN_WIDTH / 2, -960, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
-    print_sprite("ligne", &world->ligne);
-
-    // Initialisation des murs de météorites pour former des couloirs
-    init_walls(world);
-}
-
-/**
- * \brief Initialise les positions des murs de météorites pour former des couloirs
- * \param world Les données du monde
- */
-void init_walls(world_t *world) {
-    // Caractéristiques des murs
-    // clang-format off
-    int wall_positions[][4] = {
-        {48, 0, 96, 192}, // x, y, largeur, hauteur pour le mur
-        {252, 0, 96, 192},
-        {16, -352, 32, 160},
-        {188, -352, 224, 160},
-        {48, -672, 96, 192},
-        {252, -672, 96, 192}
-    };
-    // clang-format on
-
-    world->murs_count = sizeof wall_positions / sizeof wall_positions[0];
-    world->murs = malloc(sizeof(sprite_t) * world->murs_count);
-    // Initialisation des murs
-    for (size_t i = 0; i < world->murs_count; i++) {
-        init_sprite(&world->murs[i], wall_positions[i][0], wall_positions[i][1], wall_positions[i][2], wall_positions[i][3]);
-        print_sprite("mur", &world->murs[i]);
-    }
+    // Initialisation du niveau
+    init_level(world);
 }
 
 /**
@@ -106,10 +78,25 @@ void update_data(world_t *world) {
 
     // Collision avec la ligne d'arrivée
     if (sprites_collide(&world->spaceship, &world->ligne)) {
-        world->gameover = true;
-        world->has_won = true;
-        printf("You finished in %.2f s!\n", world->time_since_game_start / 1000.0);
-        return;
+        if (world->current_level < level_count) {
+            printf("Level %d complete!\n", world->current_level);
+            world->current_level++;
+            // Réinitialiser la position pour un nouveau niveau
+            int ship_x = SCREEN_WIDTH / 2;
+            int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
+            init_sprite(&world->spaceship, ship_x, ship_y, SHIP_SIZE, SHIP_SIZE);
+            print_sprite("spaceship", &world->spaceship);
+            // Libérer la mémoire des murs du niveau précédent
+            free(world->murs);
+            // Réinitialisation du niveau
+            init_level(world);
+            return;
+        } else {
+            world->gameover = true;
+            world->has_won = true;
+            printf("You finished in %.2f s!\n", world->time_since_game_start / 1000.0);
+            return;
+        }
     }
 
     // Mise à jour de la position de la ligne d'arrivée

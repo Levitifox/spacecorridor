@@ -119,6 +119,27 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
     apply_sprite(renderer, resources->spaceship, &world->spaceship);
     apply_sprite(renderer, resources->ligne, &world->ligne);
 
+    // Affichage d'un message entre les niveaux
+    {
+        static int last_level = 1;
+        if (!world->gameover && world->current_level > last_level) {
+            int center_x = SCREEN_WIDTH / 2 - 125;
+            int center_y = SCREEN_HEIGHT / 2;
+
+            char message[32];
+            sprintf(message, "Level %d complete!", last_level);
+            apply_text(renderer, center_x, center_y, 150, 30, message, resources->font);
+            update_screen(renderer);
+
+            pause(3000);
+            world->last_frame_time = SDL_GetTicks64();
+            world->start_time += 3000;
+
+            last_level = world->current_level;
+            clear_renderer(renderer);
+        }
+    }
+
     // afficher les ressources uniquement si le jeu n'est pas terminé
     if (!world->gameover) {
         apply_walls(renderer, world, resources->meteorite);
