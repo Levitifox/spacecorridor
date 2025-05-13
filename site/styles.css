@@ -79,12 +79,18 @@ pre {
     border-left: #cbbb9a solid 4px;
 
     & {
-        max-width: 800px;
+        max-width: 900px;
     }
 }
 
 .code {
     max-width: 700px;
+}
+
+.list {
+    font-size: 1.2em;
+    color: #202020;
+    margin: 0 0 0.5rem;
 }
 
 .img {
@@ -136,6 +142,28 @@ aside {
     border-right: 1px solid #e6e5e5;
     padding: 2rem 1rem;
     z-index: 100;
+
+    li {
+        border-left: 1px solid #e6e5e5;
+        padding: 0.4rem 1rem;
+        margin: 0;
+
+        a {
+            color: #404040;
+        }
+        a:hover {
+            color: #0066cc;
+            text-decoration: none;
+        }
+    }
+
+    li:hover {
+        border-left: 1px solid #ababab;
+    }
+
+    ul {
+        margin: 0;
+    }
 }
 
 .sidebar nav ul {
