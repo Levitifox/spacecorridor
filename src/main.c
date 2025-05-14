@@ -10,6 +10,7 @@
 #include "game.h"
 #include "graphics.h"
 #include "sdl2-light.h"
+#include "sdl2-ttf-light.h"
 #include <SDL_mixer.h>
 
 /**
@@ -22,6 +23,7 @@
 void clean(SDL_Window *window, SDL_Renderer *renderer, resources_t *resources, world_t *world) {
     clean_data(world);
     clean_resources(resources);
+    clean_ttf();
     clean_sdl(renderer, window);
 }
 
@@ -33,6 +35,7 @@ void clean(SDL_Window *window, SDL_Renderer *renderer, resources_t *resources, w
  */
 void init(SDL_Window **window, SDL_Renderer **renderer, resources_t *resources) {
     init_sdl(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+    init_ttf();
     SDL_SetWindowTitle(*window, "Spacecorridor"); // Définir le titre de la fenêtre
     init_resources(*renderer, resources);
 }

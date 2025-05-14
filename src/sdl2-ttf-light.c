@@ -1,4 +1,6 @@
 #include "sdl2-ttf-light.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
 
 /**
  * \brief La fonction initialise l'environnement TTF
@@ -12,7 +14,7 @@ void init_ttf() {
 
 /**
  * \brief La fonction charge une police
- * \param path le chemin du fichier correpondant à la police
+ * \param path le chemin du fichier correspondant à la police
  * \param font_size la taille de la police
  * \return la police chargée
  */
@@ -39,11 +41,17 @@ void apply_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *
     SDL_Surface *surface = TTF_RenderText_Blended(font, text, color);
 
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+    SDL_FreeSurface(surface);
     SDL_QueryTexture(texture, NULL, NULL, &w, &h);
     SDL_Rect dstrect2 = {x, y, w, h};
     SDL_RenderCopy(renderer, texture, NULL, &dstrect2);
+    SDL_DestroyTexture(texture);
 }
 
 void clean_font(TTF_Font *font) {
     TTF_CloseFont(font);
+}
+
+void clean_ttf() {
+    TTF_Quit();
 }

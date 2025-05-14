@@ -30,7 +30,6 @@ void clean_resources(resources_t *resources) {
  * \param resources Les ressources du jeu
  */
 void init_resources(SDL_Renderer *renderer, resources_t *resources) {
-    init_ttf();
     resources->background = load_image("resources/space-background.png", renderer);
     resources->spaceship = load_image("resources/spaceship.png", renderer);
     resources->ligne = load_image("resources/finish_line.png", renderer);
