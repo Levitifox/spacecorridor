@@ -34,12 +34,12 @@ void clean_resources(resources_t *resources);
 
 void init_resources(SDL_Renderer *renderer, resources_t *resources);
 
-void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect);
+void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect);
 
-void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset);
+void draw_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset);
 
-void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture);
+void draw_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture);
 
-void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources);
+void draw_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources);
 
 #endif

@@ -41,7 +41,7 @@ rect_t camera_transform(world_t *world, rect_t rect) {
     return (rect_t){rect.x, rect.y + world->camera_offset, rect.w, rect.h};
 }
 
-void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
+void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
     SDL_FRect sdl_rect = {rect.x - rect.w / 2, rect.y - rect.h / 2, rect.w, rect.h};
     SDL_RenderCopyF(renderer, texture, NULL, &sdl_rect);
 }
@@ -51,7 +51,7 @@ void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
  * \param renderer le renderer
  * \param texture la texture liée au fond
  */
-void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset) {
+void draw_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset) {
     int w, h;
     SDL_QueryTexture(texture, NULL, NULL, &w, &h);
     /* Deux copies pour un défilement continu */
@@ -67,7 +67,7 @@ void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_o
  * \param world Les données du monde
  * \param texture La texture des murs
  */
-void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
+void draw_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
     for (size_t i = 0; i < world->murs_count; i++) {
         // calculer le nombre de météorites à dessiner horizontalement et verticalement
         int num_meteos_x = world->murs[i].w / METEORITE_SIZE;
@@ -88,7 +88,7 @@ void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
                     METEORITE_SIZE,
                 };
                 /* clang-format on */
-                apply_texture(renderer, texture, camera_transform(world, rect));
+                draw_texture(renderer, texture, camera_transform(world, rect));
             }
         }
     }
@@ -100,17 +100,17 @@ void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
  * \param world les données du monde
  * \param resources les ressources
  */
-void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources) {
+void draw_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources) {
     clear_renderer(renderer);
 
     int bg_w, bg_h;
     SDL_QueryTexture(resources->background, NULL, NULL, &bg_w, &bg_h);
     int scroll_offset = (int)(world->camera_offset * BACKGROUND_SPEED) % bg_h;
-    apply_background(renderer, resources->background, scroll_offset);
+    draw_background(renderer, resources->background, scroll_offset);
 
     SDL_SetTextureAlphaMod(resources->spaceship, world->invincible ? 128 : 255);
-    apply_texture(renderer, resources->spaceship, camera_transform(world, world->spaceship));
-    apply_texture(renderer, resources->ligne, camera_transform(world, world->ligne));
+    draw_texture(renderer, resources->spaceship, camera_transform(world, world->spaceship));
+    draw_texture(renderer, resources->ligne, camera_transform(world, world->ligne));
 
     // Affichage d'un message entre les niveaux
     {
@@ -121,7 +121,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
 
             char message[32];
             sprintf(message, "Level %d complete!", last_level);
-            apply_text(renderer, center_x, center_y, 150, 30, message, resources->font);
+            draw_text(renderer, center_x, center_y, 150, 30, message, resources->font);
             update_screen(renderer);
 
             pause(3000);
@@ -134,7 +134,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
 
     // afficher les ressources uniquement si le jeu n'est pas terminé
     if (!world->gameover) {
-        apply_walls(renderer, world, resources->meteorite);
+        draw_walls(renderer, world, resources->meteorite);
     }
 
     /* Mise à jour du temps écoulé et affichage */
@@ -142,7 +142,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
         char timeText[64];
         sprintf(timeText, "Time: %.2f s", world->playing_time / 1000.0);
         // Affichage en haut à gauche
-        apply_text(renderer, 10, 10, 150, 30, timeText, resources->font);
+        draw_text(renderer, 10, 10, 150, 30, timeText, resources->font);
     }
 
     /* Message de fin de partie */
@@ -150,9 +150,9 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
         int center_x = SCREEN_WIDTH / 2 - 75;
         int center_y = SCREEN_HEIGHT / 2;
         if (world->has_won) {
-            apply_text(renderer, center_x, center_y, 150, 30, "You won!", resources->font);
+            draw_text(renderer, center_x, center_y, 150, 30, "You won!", resources->font);
         } else {
-            apply_text(renderer, center_x, center_y, 150, 30, "You lost!", resources->font);
+            draw_text(renderer, center_x, center_y, 150, 30, "You lost!", resources->font);
         }
     }
 

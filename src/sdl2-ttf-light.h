@@ -8,7 +8,7 @@ void init_ttf();
 
 TTF_Font *load_font(const char *path, int font_size);
 
-void apply_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *text, TTF_Font *font);
+void draw_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *text, TTF_Font *font);
 
 void clean_font(TTF_Font *font);
 

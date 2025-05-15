@@ -36,7 +36,7 @@ TTF_Font *load_font(const char *path, int font_size) {
  * \param text le texte à afficher
  * \param font la police
  */
-void apply_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *text, TTF_Font *font) {
+void draw_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *text, TTF_Font *font) {
     SDL_Color color = {230, 212, 175, 255};
     SDL_Surface *surface = TTF_RenderText_Blended(font, text, color);
 

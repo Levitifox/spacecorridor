@@ -100,7 +100,7 @@ int main(int argc, char **argv) {
         update_data(&world);
 
         // rafraichissement de l'écran
-        refresh_graphics(renderer, &world, &resources);
+        draw_graphics(renderer, &world, &resources);
 
         Uint64 now_time = SDL_GetTicks64();
         Uint64 next_frame_time = world.last_frame_time + 1000 / MAX_FPS;
