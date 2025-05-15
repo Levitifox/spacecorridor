@@ -97,7 +97,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
     int scroll_offset = (int)(world->time_since_game_start * BACKGROUND_SPEED) % bg_h;
     apply_background(renderer, resources->background, scroll_offset);
 
-    SDL_SetTextureAlphaMod(resources->spaceship, world->invisible ? 128 : 255);
+    SDL_SetTextureAlphaMod(resources->spaceship, world->invincible ? 128 : 255);
     apply_sprite(renderer, resources->spaceship, &world->spaceship);
     apply_sprite(renderer, resources->ligne, &world->ligne);
 
