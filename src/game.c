@@ -23,7 +23,6 @@ void init_data(world_t *world) {
     world->camera_offset = 0.0;
     world->gameover = false;
     world->speed = INITIAL_SPEED;
-    world->start_time = SDL_GetTicks64();
     world->last_frame_time = SDL_GetTicks64();
     world->has_won = false;
     world->invincible = false;
@@ -52,9 +51,9 @@ void clean_data(world_t *world) {
  * \param world les données du monde
  */
 void update_data(world_t *world) {
-    world->time_since_game_start = SDL_GetTicks64() - world->start_time;
     world->time_since_last_frame = SDL_GetTicks64() - world->last_frame_time;
     world->last_frame_time = SDL_GetTicks64();
+    world->playing_time += world->time_since_last_frame;
 
     if (world->gameover) {
         return;
@@ -99,7 +98,7 @@ void update_data(world_t *world) {
         } else {
             world->gameover = true;
             world->has_won = true;
-            printf("You finished in %.2f s!\n", world->time_since_game_start / 1000.0);
+            printf("You finished in %.2f s!\n", world->playing_time / 1000.0);
             return;
         }
     }

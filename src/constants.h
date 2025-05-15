@@ -56,6 +56,6 @@
 /**
  * \brief Vitesse de défilement de l'arrière-plan
  */
-#define BACKGROUND_SPEED 0.1
+#define BACKGROUND_SPEED 0.8
 
 #endif

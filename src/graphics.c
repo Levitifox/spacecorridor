@@ -105,7 +105,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
 
     int bg_w, bg_h;
     SDL_QueryTexture(resources->background, NULL, NULL, &bg_w, &bg_h);
-    int scroll_offset = (int)(world->time_since_game_start * BACKGROUND_SPEED) % bg_h;
+    int scroll_offset = (int)(world->camera_offset * BACKGROUND_SPEED) % bg_h;
     apply_background(renderer, resources->background, scroll_offset);
 
     SDL_SetTextureAlphaMod(resources->spaceship, world->invincible ? 128 : 255);
@@ -126,7 +126,6 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
 
             pause(3000);
             world->last_frame_time = SDL_GetTicks64();
-            world->start_time += 3000;
 
             last_level = world->current_level;
             clear_renderer(renderer);
@@ -141,7 +140,7 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
     /* Mise à jour du temps écoulé et affichage */
     {
         char timeText[64];
-        sprintf(timeText, "Time: %.2f s", world->time_since_game_start / 1000.0);
+        sprintf(timeText, "Time: %.2f s", world->playing_time / 1000.0);
         // Affichage en haut à gauche
         apply_text(renderer, 10, 10, 150, 30, timeText, resources->font);
     }

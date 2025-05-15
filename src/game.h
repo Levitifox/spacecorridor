@@ -32,8 +32,7 @@ struct world_s {
     size_t murs_count;
     rect_t *murs;                 /*!< Tableau de murs de météorites */
     double speed;                 /*!< Vitesse du déplacement dans le jeu */
-    Uint64 start_time;            /*!< Temps de début du jeu */
-    Uint64 time_since_game_start; /*!< Temps écoulé depuis le début du jeu */
+    Uint64 playing_time;          /*!< Temps écoulé */
     Uint64 last_frame_time;       /*!< Temps de la dernière frame rendue */
     Uint64 time_since_last_frame; /*!< Temps écoulé depuis la dernière frame */
     bool has_won;                 /*!< Indique si le joueur a gagné */
