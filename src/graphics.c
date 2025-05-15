@@ -37,9 +37,13 @@ void init_resources(SDL_Renderer *renderer, resources_t *resources) {
     resources->font = load_font("resources/COOPBL.ttf", 28);
 }
 
+rect_t camera_transform(world_t *world, rect_t rect) {
+    return (rect_t){rect.x, rect.y + world->camera_offset, rect.w, rect.h};
+}
+
 void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
-    SDL_Rect sdl_rect = {rect.x - rect.w / 2, rect.y - rect.h / 2, rect.w, rect.h};
-    SDL_RenderCopy(renderer, texture, NULL, &sdl_rect);
+    SDL_FRect sdl_rect = {rect.x - rect.w / 2, rect.y - rect.h / 2, rect.w, rect.h};
+    SDL_RenderCopyF(renderer, texture, NULL, &sdl_rect);
 }
 
 /**
@@ -76,8 +80,15 @@ void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
         // dessine les météorites
         for (int j = 0; j < num_meteos_y; j++) {
             for (int k = 0; k < num_meteos_x; k++) {
-                SDL_Rect rect = {start_x + k * METEORITE_SIZE, start_y + j * METEORITE_SIZE, METEORITE_SIZE, METEORITE_SIZE};
-                SDL_RenderCopy(renderer, texture, NULL, &rect);
+                /* clang-format off */
+                rect_t rect = {
+                    start_x + k * METEORITE_SIZE + METEORITE_SIZE / 2,
+                    start_y + j * METEORITE_SIZE + METEORITE_SIZE / 2,
+                    METEORITE_SIZE,
+                    METEORITE_SIZE,
+                };
+                /* clang-format on */
+                apply_texture(renderer, texture, camera_transform(world, rect));
             }
         }
     }
@@ -98,8 +109,8 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
     apply_background(renderer, resources->background, scroll_offset);
 
     SDL_SetTextureAlphaMod(resources->spaceship, world->invincible ? 128 : 255);
-    apply_texture(renderer, resources->spaceship, world->spaceship);
-    apply_texture(renderer, resources->ligne, world->ligne);
+    apply_texture(renderer, resources->spaceship, camera_transform(world, world->spaceship));
+    apply_texture(renderer, resources->ligne, camera_transform(world, world->ligne));
 
     // Affichage d'un message entre les niveaux
     {

@@ -20,6 +20,7 @@ void print_rect(char *name, rect_t rect) {
  * \param world les données du monde
  */
 void init_data(world_t *world) {
+    world->camera_offset = 0.0;
     world->gameover = false;
     world->speed = INITIAL_SPEED;
     world->start_time = SDL_GetTicks64();
@@ -68,47 +69,10 @@ void update_data(world_t *world) {
         return;
     }
 
-    // Collision avec la ligne d'arrivée
-    if (rects_collide(world->spaceship, world->ligne)) {
-        if (world->current_level < level_count) {
-            printf("Level %d complete!\n", world->current_level);
-            world->current_level++;
-            // Réinitialiser la position pour un nouveau niveau
-            int ship_x = SCREEN_WIDTH / 2;
-            int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
-            world->spaceship = (rect_t){ship_x, ship_y, SHIP_SIZE, SHIP_SIZE};
-            print_rect("spaceship", world->spaceship);
-            // Libérer la mémoire des murs du niveau précédent
-            free(world->murs);
-            // Réinitialisation du niveau
-            init_level(world);
-            return;
-        } else {
-            world->gameover = true;
-            world->has_won = true;
-            printf("You finished in %.2f s!\n", world->time_since_game_start / 1000.0);
-            return;
-        }
-    }
+    // Mise à jour de la position de la camera
+    world->camera_offset += world->speed * world->time_since_last_frame;
 
-    // Mise à jour de la position de la ligne d'arrivée
-    world->ligne.y += world->speed * world->time_since_last_frame;
-
-    // Mise à jour des murs et vérifications des limites du vaisseau
-    update_walls(world);
-    check_left_boundary(world->spaceship);
-    check_right_boundary(world->spaceship);
-
-    if (!world->invincible) {
-        // Collision entre le vaisseau et le mur de météorites
-        for (size_t i = 0; i < world->murs_count; i++) {
-            if (rects_collide(world->spaceship, world->murs[i])) {
-                world->gameover = true;
-                printf("You lost!\n");
-                return;
-            }
-        }
-    }
+    world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
 
     // Gestion des mouvements
     const Uint8 *keystate = SDL_GetKeyboardState(NULL);
@@ -124,15 +88,42 @@ void update_data(world_t *world) {
     if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
         world->spaceship.y += MOVING_STEP * world->time_since_last_frame;
     }
-}
 
-/**
- * \brief Met à jour la position des murs de météorites
- * \param world Les données du monde
- */
-void update_walls(world_t *world) {
-    for (size_t i = 0; i < world->murs_count; i++) {
-        world->murs[i].y += world->speed * world->time_since_last_frame;
+    // Collision avec la ligne d'arrivée
+    if (rects_collide(world->spaceship, world->ligne)) {
+        if (world->current_level < level_count) {
+            printf("Level %d complete!\n", world->current_level);
+            world->current_level++;
+            // Réinitialiser la position pour un nouveau niveau
+            int ship_x = SCREEN_WIDTH / 2;
+            int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
+            world->spaceship = (rect_t){ship_x, ship_y, SHIP_SIZE, SHIP_SIZE};
+            print_rect("spaceship", world->spaceship);
+            // Libérer la mémoire des murs du niveau précédent
+            free(world->murs);
+            // Réinitialisation du niveau
+            init_level(world);
+            world->camera_offset = 0.0;
+            return;
+        } else {
+            world->gameover = true;
+            world->has_won = true;
+            printf("You finished in %.2f s!\n", world->time_since_game_start / 1000.0);
+            return;
+        }
+    }
+
+    world->spaceship.x = CLAMP(world->spaceship.x, world->spaceship.w / 2, SCREEN_WIDTH - world->spaceship.w / 2);
+
+    if (!world->invincible) {
+        // Collision entre le vaisseau et le mur de météorites
+        for (size_t i = 0; i < world->murs_count; i++) {
+            if (rects_collide(world->spaceship, world->murs[i])) {
+                world->gameover = true;
+                printf("You lost!\n");
+                return;
+            }
+        }
     }
 }
 
@@ -157,28 +148,6 @@ void handle_events(SDL_Event *event, world_t *world) {
                 world->invincible = !world->invincible;
             }
         }
-    }
-}
-
-/**
- * \brief Vérifie et corrige la position du vaisseau s'il dépasse la limite gauche de l'écran
- * \param spaceship Le rect du vaisseau
- */
-void check_left_boundary(rect_t spaceship) {
-    // Si le bord gauche du vaisseau (position x - moitié largeur) est inférieur à 0
-    if (spaceship.x - spaceship.w / 2 < 0) {
-        spaceship.x = spaceship.w / 2;
-    }
-}
-
-/**
- * \brief Vérifie et corrige la position du vaisseau s'il dépasse la limite droite de l'écran
- * \param spaceship Le rect du vaisseau
- */
-void check_right_boundary(rect_t spaceship) {
-    // Si le bord droit du vaisseau (position x + moitié largeur) est supérieur à la largeur de l'écran
-    if (spaceship.x + spaceship.w / 2 > SCREEN_WIDTH) {
-        spaceship.x = SCREEN_WIDTH - spaceship.w / 2;
     }
 }
 

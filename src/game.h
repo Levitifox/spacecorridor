@@ -25,6 +25,7 @@ typedef struct rect_s rect_t;
  * \brief Représentation du monde du jeu
  */
 struct world_s {
+    double camera_offset;
     rect_t spaceship;
     bool gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
     rect_t ligne;  /*!< La ligne d'arrivée */
@@ -57,12 +58,6 @@ void update_data(world_t *world);
 
 void handle_events(SDL_Event *event, world_t *world);
 
-void check_left_boundary(rect_t spaceship);
-
-void check_right_boundary(rect_t spaceship);
-
 bool rects_collide(rect_t rect_1, rect_t rect_2);
-
-void update_walls(world_t *world);
 
 #endif
