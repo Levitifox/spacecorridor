@@ -18,7 +18,6 @@ struct sprite_s {
     double y;
     double w;
     double h;
-    bool is_visible;
 };
 typedef struct sprite_s sprite_t;
 
@@ -65,10 +64,6 @@ void check_left_boundary(sprite_t *spaceship);
 void check_right_boundary(sprite_t *spaceship);
 
 bool sprites_collide(sprite_t *sp1, sprite_t *sp2);
-
-void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, bool make_disappear);
-
-void init_walls(world_t *world);
 
 void update_walls(world_t *world);
 

@@ -16,7 +16,6 @@ void init_sprite(sprite_t *sprite, double x, double y, double w, double h) {
     sprite->y = y;
     sprite->w = w;
     sprite->h = h;
-    sprite->is_visible = true;
 }
 
 void print_sprite(char *name, sprite_t *sprite) {
@@ -100,12 +99,7 @@ void update_data(world_t *world) {
     }
 
     // Mise à jour de la position de la ligne d'arrivée
-    if (world->ligne.y < SCREEN_HEIGHT - FINISH_LINE_HEIGHT) {
-        world->ligne.y += world->speed * world->time_since_last_frame;
-    } else {
-        // Une fois la ligne en bas, on la maintient pour déclencher la collision
-        world->ligne.y = SCREEN_HEIGHT - FINISH_LINE_HEIGHT;
-    }
+    world->ligne.y += world->speed * world->time_since_last_frame;
 
     // Mise à jour des murs et vérifications des limites du vaisseau
     update_walls(world);
@@ -131,10 +125,7 @@ void update_data(world_t *world) {
  */
 void update_walls(world_t *world) {
     for (size_t i = 0; i < world->murs_count; i++) {
-        // Mettre à jour uniquement si le mur est visible
-        if (world->murs[i].is_visible) {
-            world->murs[i].y += world->speed * world->time_since_last_frame;
-        }
+        world->murs[i].y += world->speed * world->time_since_last_frame;
     }
 }
 
@@ -206,22 +197,4 @@ void check_right_boundary(sprite_t *spaceship) {
 bool sprites_collide(sprite_t *sp1, sprite_t *sp2) {
     return MAX(sp1->x - sp1->w / 2, sp2->x - sp2->w / 2) <= MIN(sp1->x + sp1->w / 2, sp2->x + sp2->w / 2) &&
            MAX(sp1->y - sp1->h / 2, sp2->y - sp2->h / 2) <= MIN(sp1->y + sp1->h / 2, sp2->y + sp2->h / 2);
-}
-
-/**
- * \brief Gère la collision entre deux sprites
- * \param sp1 Le premier sprite
- * \param sp2 Le deuxième sprite
- * \param world Les données du monde
- * \param make_disappear Si vrai, le premier sprite (sp1) disparaît en cas de collision
- */
-void handle_sprites_collision(sprite_t *sp1, sprite_t *sp2, world_t *world, bool make_disappear) {
-    // Si les deux sprites entrent en collision
-    if (sprites_collide(sp1, sp2)) {
-        // Alors la vitesse de déplacement verticale dans le monde devient nulle
-        world->speed = 0;
-        if (make_disappear) {
-            sp1->is_visible = false;
-        }
-    }
 }

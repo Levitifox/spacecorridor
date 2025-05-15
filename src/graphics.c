@@ -38,10 +38,8 @@ void init_resources(SDL_Renderer *renderer, resources_t *resources) {
 }
 
 void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {
-    if (sprite->is_visible) {
-        SDL_Rect rect = {sprite->x - sprite->w / 2, sprite->y - sprite->h / 2, sprite->w, sprite->h};
-        SDL_RenderCopy(renderer, texture, NULL, &rect);
-    }
+    SDL_Rect rect = {sprite->x - sprite->w / 2, sprite->y - sprite->h / 2, sprite->w, sprite->h};
+    SDL_RenderCopy(renderer, texture, NULL, &rect);
 }
 
 /**
@@ -57,23 +55,6 @@ void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_o
     SDL_Rect dest2 = {0, scroll_offset - h, w, h};
     SDL_RenderCopy(renderer, texture, NULL, &dest1);
     SDL_RenderCopy(renderer, texture, NULL, &dest2);
-}
-
-/**
- * \brief Dessiner les meteos
- * \param renderer le renderer
- * \param world les données du monde
- * \param texture la texture liée au fond
- */
-void apply_wall(int h, int w, SDL_Renderer *renderer, SDL_Texture *texture, world_t *world) {
-    double px = world->murs->x;
-    double py = world->murs->y;
-    int meteo = 192;
-    for (int i = 0; i < h; i++) {
-        for (int j = 0; j < w; j++) {
-            apply_texture(texture, renderer, px - (w * METEORITE_SIZE) / 2 + j * METEORITE_SIZE, py - (h * METEORITE_SIZE) / 2 + i * METEORITE_SIZE + meteo);
-        }
-    }
 }
 
 /**

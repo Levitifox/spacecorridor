@@ -38,7 +38,7 @@ void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite
 
 void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset);
 
-void apply_wall(int h, int w, SDL_Renderer *renderer, SDL_Texture *texture, world_t *world);
+void apply_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture);
 
 void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources);
 
