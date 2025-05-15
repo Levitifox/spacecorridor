@@ -52,11 +52,9 @@ void init_data(world_t *world);
 
 void clean_data(world_t *world);
 
-bool is_game_over(world_t *world);
-
 void update_data(world_t *world);
 
-void handle_events(SDL_Event *event, world_t *world);
+void handle_events(world_t *world);
 
 bool rects_collide(rect_t rect_1, rect_t rect_2);
 

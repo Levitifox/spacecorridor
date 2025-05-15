@@ -92,14 +92,12 @@ int main(int argc, char **argv) {
     show_splash_screen(renderer, "resources/splash_screen.png", 3000);
 
     init_data(&world);
-    while (!is_game_over(&world)) { // tant que le jeu n'est pas fini
-        SDL_Event event;
+    while (!world.gameover) { // tant que le jeu n'est pas fini
+        // gestion des évènements
+        handle_events(&world);
 
         // mise à jour des données liée à la physique du monde
         update_data(&world);
-
-        // gestion des évènements
-        handle_events(&event, &world);
 
         // rafraichissement de l'écran
         refresh_graphics(renderer, &world, &resources);

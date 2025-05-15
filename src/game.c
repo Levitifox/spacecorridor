@@ -48,15 +48,6 @@ void clean_data(world_t *world) {
 }
 
 /**
- * \brief La fonction indique si le jeu est fini en fonction des données du monde
- * \param world les données du monde
- * \return true si le jeu est fini, false sinon
- */
-bool is_game_over(world_t *world) {
-    return world->gameover;
-}
-
-/**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param world les données du monde
  */
@@ -129,22 +120,22 @@ void update_data(world_t *world) {
 
 /**
  * \brief La fonction gère les évènements ayant eu lieu et qui n'ont pas encore été traités
- * \param event paramètre qui contient les événements
  * \param world les données du monde
  */
-void handle_events(SDL_Event *event, world_t *world) {
-    while (SDL_PollEvent(event)) {
+void handle_events(world_t *world) {
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
         // Si l'utilisateur a cliqué sur le X de la fenêtre
-        if (event->type == SDL_QUIT) {
+        if (event.type == SDL_QUIT) {
             // On indique la fin du jeu
             world->gameover = true;
         }
         // Quitter (Echap)
-        if (event->type == SDL_KEYDOWN) {
-            if (event->key.keysym.sym == SDLK_ESCAPE) {
+        if (event.type == SDL_KEYDOWN) {
+            if (event.key.keysym.sym == SDLK_ESCAPE) {
                 world->gameover = true;
             }
-            if (event->key.keysym.sym == SDLK_i) {
+            if (event.key.keysym.sym == SDLK_i) {
                 world->invincible = !world->invincible;
             }
         }
