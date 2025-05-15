@@ -37,9 +37,9 @@ void init_resources(SDL_Renderer *renderer, resources_t *resources) {
     resources->font = load_font("resources/COOPBL.ttf", 28);
 }
 
-void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite) {
-    SDL_Rect rect = {sprite->x - sprite->w / 2, sprite->y - sprite->h / 2, sprite->w, sprite->h};
-    SDL_RenderCopy(renderer, texture, NULL, &rect);
+void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
+    SDL_Rect sdl_rect = {rect.x - rect.w / 2, rect.y - rect.h / 2, rect.w, rect.h};
+    SDL_RenderCopy(renderer, texture, NULL, &sdl_rect);
 }
 
 /**
@@ -98,8 +98,8 @@ void refresh_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resou
     apply_background(renderer, resources->background, scroll_offset);
 
     SDL_SetTextureAlphaMod(resources->spaceship, world->invincible ? 128 : 255);
-    apply_sprite(renderer, resources->spaceship, &world->spaceship);
-    apply_sprite(renderer, resources->ligne, &world->ligne);
+    apply_texture(renderer, resources->spaceship, world->spaceship);
+    apply_texture(renderer, resources->ligne, world->ligne);
 
     // Affichage d'un message entre les niveaux
     {

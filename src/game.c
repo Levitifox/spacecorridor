@@ -11,15 +11,8 @@
 #include "level.h"
 #include "sdl2-light.h"
 
-void init_sprite(sprite_t *sprite, double x, double y, double w, double h) {
-    sprite->x = x;
-    sprite->y = y;
-    sprite->w = w;
-    sprite->h = h;
-}
-
-void print_sprite(char *name, sprite_t *sprite) {
-    printf("Sprite \"%s\" : %gx%g+%g+%g\n", name, sprite->w, sprite->h, sprite->x, sprite->y);
+void print_rect(char *name, rect_t rect) {
+    printf("Rect \"%s\" : %gx%g+%g+%g\n", name, rect.w, rect.h, rect.x, rect.y);
 }
 
 /**
@@ -38,8 +31,8 @@ void init_data(world_t *world) {
     int ship_x = SCREEN_WIDTH / 2;
     int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
 
-    init_sprite(&world->spaceship, ship_x, ship_y, SHIP_SIZE, SHIP_SIZE);
-    print_sprite("spaceship", &world->spaceship);
+    world->spaceship = (rect_t){ship_x, ship_y, SHIP_SIZE, SHIP_SIZE};
+    print_rect("spaceship", world->spaceship);
 
     // Initialisation du niveau
     init_level(world);
@@ -76,15 +69,15 @@ void update_data(world_t *world) {
     }
 
     // Collision avec la ligne d'arrivée
-    if (sprites_collide(&world->spaceship, &world->ligne)) {
+    if (rects_collide(world->spaceship, world->ligne)) {
         if (world->current_level < level_count) {
             printf("Level %d complete!\n", world->current_level);
             world->current_level++;
             // Réinitialiser la position pour un nouveau niveau
             int ship_x = SCREEN_WIDTH / 2;
             int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
-            init_sprite(&world->spaceship, ship_x, ship_y, SHIP_SIZE, SHIP_SIZE);
-            print_sprite("spaceship", &world->spaceship);
+            world->spaceship = (rect_t){ship_x, ship_y, SHIP_SIZE, SHIP_SIZE};
+            print_rect("spaceship", world->spaceship);
             // Libérer la mémoire des murs du niveau précédent
             free(world->murs);
             // Réinitialisation du niveau
@@ -103,13 +96,13 @@ void update_data(world_t *world) {
 
     // Mise à jour des murs et vérifications des limites du vaisseau
     update_walls(world);
-    check_left_boundary(&world->spaceship);
-    check_right_boundary(&world->spaceship);
+    check_left_boundary(world->spaceship);
+    check_right_boundary(world->spaceship);
 
     if (!world->invincible) {
         // Collision entre le vaisseau et le mur de météorites
         for (size_t i = 0; i < world->murs_count; i++) {
-            if (sprites_collide(&world->spaceship, &world->murs[i])) {
+            if (rects_collide(world->spaceship, world->murs[i])) {
                 world->gameover = true;
                 printf("You lost!\n");
                 return;
@@ -169,33 +162,33 @@ void handle_events(SDL_Event *event, world_t *world) {
 
 /**
  * \brief Vérifie et corrige la position du vaisseau s'il dépasse la limite gauche de l'écran
- * \param spaceship Le sprite du vaisseau
+ * \param spaceship Le rect du vaisseau
  */
-void check_left_boundary(sprite_t *spaceship) {
+void check_left_boundary(rect_t spaceship) {
     // Si le bord gauche du vaisseau (position x - moitié largeur) est inférieur à 0
-    if (spaceship->x - spaceship->w / 2 < 0) {
-        spaceship->x = spaceship->w / 2;
+    if (spaceship.x - spaceship.w / 2 < 0) {
+        spaceship.x = spaceship.w / 2;
     }
 }
 
 /**
  * \brief Vérifie et corrige la position du vaisseau s'il dépasse la limite droite de l'écran
- * \param spaceship Le sprite du vaisseau
+ * \param spaceship Le rect du vaisseau
  */
-void check_right_boundary(sprite_t *spaceship) {
+void check_right_boundary(rect_t spaceship) {
     // Si le bord droit du vaisseau (position x + moitié largeur) est supérieur à la largeur de l'écran
-    if (spaceship->x + spaceship->w / 2 > SCREEN_WIDTH) {
-        spaceship->x = SCREEN_WIDTH - spaceship->w / 2;
+    if (spaceship.x + spaceship.w / 2 > SCREEN_WIDTH) {
+        spaceship.x = SCREEN_WIDTH - spaceship.w / 2;
     }
 }
 
 /**
- * \brief Indique si deux sprites sont en collision
- * \param sp1 Le premier sprite
- * \param sp2 Le deuxième sprite
+ * \brief Indique si deux rects sont en collision
+ * \param rect_1 Le premier rect
+ * \param rect_2 Le deuxième rect
  * \return true s'il y a collision, false sinon
  */
-bool sprites_collide(sprite_t *sp1, sprite_t *sp2) {
-    return MAX(sp1->x - sp1->w / 2, sp2->x - sp2->w / 2) <= MIN(sp1->x + sp1->w / 2, sp2->x + sp2->w / 2) &&
-           MAX(sp1->y - sp1->h / 2, sp2->y - sp2->h / 2) <= MIN(sp1->y + sp1->h / 2, sp2->y + sp2->h / 2);
+bool rects_collide(rect_t rect_1, rect_t rect_2) {
+    return MAX(rect_1.x - rect_1.w / 2, rect_2.x - rect_2.w / 2) <= MIN(rect_1.x + rect_1.w / 2, rect_2.x + rect_2.w / 2) &&
+           MAX(rect_1.y - rect_1.h / 2, rect_2.y - rect_2.h / 2) <= MIN(rect_1.y + rect_1.h / 2, rect_2.y + rect_2.h / 2);
 }

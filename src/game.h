@@ -13,23 +13,23 @@
 #include "sdl2-light.h"
 #include <stdbool.h>
 
-struct sprite_s {
+struct rect_s {
     double x;
     double y;
     double w;
     double h;
 };
-typedef struct sprite_s sprite_t;
+typedef struct rect_s rect_t;
 
 /**
  * \brief Représentation du monde du jeu
  */
 struct world_s {
-    sprite_t spaceship;
-    bool gameover;  /*!< Champ indiquant si l'on est à la fin du jeu */
-    sprite_t ligne; /*!< La ligne d'arrivée */
+    rect_t spaceship;
+    bool gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
+    rect_t ligne;  /*!< La ligne d'arrivée */
     size_t murs_count;
-    sprite_t *murs;               /*!< Tableau de murs de météorites */
+    rect_t *murs;                 /*!< Tableau de murs de météorites */
     double speed;                 /*!< Vitesse du déplacement dans le jeu */
     Uint64 start_time;            /*!< Temps de début du jeu */
     Uint64 time_since_game_start; /*!< Temps écoulé depuis le début du jeu */
@@ -45,9 +45,7 @@ struct world_s {
  */
 typedef struct world_s world_t;
 
-void init_sprite(sprite_t *sprite, double x, double y, double w, double h);
-
-void print_sprite(char *name, sprite_t *sprite);
+void print_rect(char *name, rect_t rect);
 
 void init_data(world_t *world);
 
@@ -59,11 +57,11 @@ void update_data(world_t *world);
 
 void handle_events(SDL_Event *event, world_t *world);
 
-void check_left_boundary(sprite_t *spaceship);
+void check_left_boundary(rect_t spaceship);
 
-void check_right_boundary(sprite_t *spaceship);
+void check_right_boundary(rect_t spaceship);
 
-bool sprites_collide(sprite_t *sp1, sprite_t *sp2);
+bool rects_collide(rect_t rect_1, rect_t rect_2);
 
 void update_walls(world_t *world);
 

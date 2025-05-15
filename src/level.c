@@ -73,15 +73,15 @@ void init_level(world_t *world) {
         murs_count = 0;
     }
 
-    init_sprite(&world->ligne, SCREEN_WIDTH / 2, finish_line_y, SCREEN_WIDTH, FINISH_LINE_HEIGHT);
-    print_sprite("ligne", &world->ligne);
+    world->ligne = (rect_t){SCREEN_WIDTH / 2, finish_line_y, SCREEN_WIDTH, FINISH_LINE_HEIGHT};
+    print_rect("ligne", world->ligne);
 
     world->murs_count = murs_count;
     if (murs_count > 0) {
-        world->murs = malloc(sizeof(sprite_t) * murs_count);
+        world->murs = malloc(sizeof(rect_t) * murs_count);
         for (size_t i = 0; i < murs_count; i++) {
-            init_sprite(&world->murs[i], wall_positions[i][0], wall_positions[i][1], wall_positions[i][2], wall_positions[i][3]);
-            print_sprite("mur", &world->murs[i]);
+            world->murs[i] = (rect_t){wall_positions[i][0], wall_positions[i][1], wall_positions[i][2], wall_positions[i][3]};
+            print_rect("mur", world->murs[i]);
         }
     } else {
         world->murs = NULL;

@@ -34,7 +34,7 @@ void clean_resources(resources_t *resources);
 
 void init_resources(SDL_Renderer *renderer, resources_t *resources);
 
-void apply_sprite(SDL_Renderer *renderer, SDL_Texture *texture, sprite_t *sprite);
+void apply_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect);
 
 void apply_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset);
 
