@@ -117,6 +117,21 @@ void update_data(world_t *world) {
             }
         }
     }
+
+    // Gestion des mouvements
+    const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+    if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q]) {
+        world->spaceship.x -= MOVING_STEP * world->time_since_last_frame;
+    }
+    if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D]) {
+        world->spaceship.x += MOVING_STEP * world->time_since_last_frame;
+    }
+    if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z]) {
+        world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
+    }
+    if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
+        world->spaceship.y += MOVING_STEP * world->time_since_last_frame;
+    }
 }
 
 /**
@@ -142,27 +157,14 @@ void handle_events(SDL_Event *event, world_t *world) {
             world->gameover = true;
         }
         // Quitter (Echap)
-        if (event->type == SDL_KEYDOWN && event->key.keysym.sym == SDLK_ESCAPE) {
-            world->gameover = true;
+        if (event->type == SDL_KEYDOWN) {
+            if (event->key.keysym.sym == SDLK_ESCAPE) {
+                world->gameover = true;
+            }
+            if (event->key.keysym.sym == SDLK_i) {
+                world->invisible = !world->invisible;
+            }
         }
-    }
-
-    // Gestion des mouvements
-    const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-    if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q]) {
-        world->spaceship.x -= MOVING_STEP * world->time_since_last_frame;
-    }
-    if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D]) {
-        world->spaceship.x += MOVING_STEP * world->time_since_last_frame;
-    }
-    if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z]) {
-        world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
-    }
-    if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
-        world->spaceship.y += MOVING_STEP * world->time_since_last_frame;
-    }
-    if (keystate[SDL_SCANCODE_I]) {
-        world->invisible = !world->invisible;
     }
 }
 
