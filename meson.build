@@ -18,6 +18,7 @@ executable(
         'src/game.c',
         'src/graphics.c',
         'src/level.c',
+        'src/resources.c',
         'src/sdl2-ttf-light.c',
     ],
     dependencies: [sdl2, sdl2_image, sdl2_ttf, sdl2_mixer],
