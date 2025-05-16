@@ -13,18 +13,17 @@
 #include "sdl2-light.h"
 #include <stdbool.h>
 
-struct rect_s {
+typedef struct rect_s {
     double x;
     double y;
     double w;
     double h;
-};
-typedef struct rect_s rect_t;
+} rect_t;
 
 /**
  * \brief Représentation du monde du jeu
  */
-struct world_s {
+typedef struct world_s {
     double camera_offset;
     rect_t spaceship;
     bool gameover; /*!< Champ indiquant si l'on est à la fin du jeu */
@@ -38,12 +37,7 @@ struct world_s {
     bool has_won;                 /*!< Indique si le joueur a gagné */
     bool invincible;              /*!< Indique si le joueur est dans un mode invincible */
     int current_level;            /*!< Niveau actuel du joueur */
-};
-
-/**
- * \brief Type qui correspond aux données du monde
- */
-typedef struct world_s world_t;
+} world_t;
 
 void print_rect(char *name, rect_t rect);
 
