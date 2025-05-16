@@ -16,10 +16,10 @@
  * \brief Représentation pour stocker les textures nécessaires à l'affichage graphique
  */
 typedef struct resources_s {
-    SDL_Texture *background; /*!< Texture liée à l'image du fond de l'écran. */
-    SDL_Texture *spaceship;
-    SDL_Texture *ligne;
-    SDL_Texture *meteorite;
+    SDL_Texture *background_texture; /*!< Texture liée à l'image du fond de l'écran. */
+    SDL_Texture *spaceship_texture;
+    SDL_Texture *finish_line_texture;
+    SDL_Texture *meteorite_texture;
     TTF_Font *font;
 } resources_t;
 

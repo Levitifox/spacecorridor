@@ -79,13 +79,13 @@ void draw_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resource
     clear_renderer(renderer);
 
     int bg_w, bg_h;
-    SDL_QueryTexture(resources->background, NULL, NULL, &bg_w, &bg_h);
+    SDL_QueryTexture(resources->background_texture, NULL, NULL, &bg_w, &bg_h);
     int scroll_offset = (int)(world->camera_offset * BACKGROUND_SPEED) % bg_h;
-    draw_background(renderer, resources->background, scroll_offset);
+    draw_background(renderer, resources->background_texture, scroll_offset);
 
-    SDL_SetTextureAlphaMod(resources->spaceship, world->invincible ? 128 : 255);
-    draw_texture(renderer, resources->spaceship, camera_transform(world, world->spaceship));
-    draw_texture(renderer, resources->ligne, camera_transform(world, world->ligne));
+    SDL_SetTextureAlphaMod(resources->spaceship_texture, world->invincible ? 128 : 255);
+    draw_texture(renderer, resources->spaceship_texture, camera_transform(world, world->spaceship));
+    draw_texture(renderer, resources->finish_line_texture, camera_transform(world, world->ligne));
 
     // Affichage d'un message entre les niveaux
     {
@@ -109,7 +109,7 @@ void draw_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resource
 
     // afficher les ressources uniquement si le jeu n'est pas terminé
     if (!world->gameover) {
-        draw_walls(renderer, world, resources->meteorite);
+        draw_walls(renderer, world, resources->meteorite_texture);
     }
 
     /* Mise à jour du temps écoulé et affichage */

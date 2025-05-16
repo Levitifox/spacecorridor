@@ -20,24 +20,18 @@ int init_sdl(SDL_Window **window, SDL_Renderer **renderer, int width, int height
     return 0;
 }
 
-SDL_Texture *load_image(const char path[], SDL_Renderer *renderer) {
+SDL_Texture *load_image(const char *path, SDL_Renderer *renderer) {
     SDL_Surface *image_surface = IMG_Load(path);
     if (image_surface == NULL) {
         fprintf(stderr, "Erreur pendant chargement image : %s\n", IMG_GetError());
         return NULL;
     }
-    SDL_Surface *window_surface = SDL_GetWindowSurface(SDL_RenderGetWindow(renderer));
-    if (window_surface == NULL) {
-        printf("Impossible d'obtenir la surface! Erreur SDL : %s\n", SDL_GetError());
-        return NULL;
-    }
-    SDL_Surface *converted_image_surface = SDL_ConvertSurface(image_surface, window_surface->format, 0);
+    SDL_Surface *converted_image_surface = SDL_ConvertSurfaceFormat(image_surface, SDL_PIXELFORMAT_RGBA32, 0);
     SDL_FreeSurface(image_surface);
     if (converted_image_surface == NULL) {
         printf("Impossible d'optimiser l'image! Erreur SDL : %s\n", SDL_GetError());
         return NULL;
     }
-    SDL_SetColorKey(converted_image_surface, SDL_TRUE, SDL_MapRGB(converted_image_surface->format, 255, 0, 255));
     SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, converted_image_surface);
     SDL_FreeSurface(converted_image_surface);
     if (texture == NULL) {
