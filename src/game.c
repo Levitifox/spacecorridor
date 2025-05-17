@@ -9,10 +9,9 @@
 #include "game.h"
 #include "constants.h"
 #include "level.h"
-#include "sdl2-light.h"
 
 void print_rect(char *name, rect_t rect) {
-    printf("Rect \"%s\" : %gx%g+%g+%g\n", name, rect.w, rect.h, rect.x, rect.y);
+    printf("Rect \"%s\" : %gx%g%+g%+g\n", name, rect.w, rect.h, rect.x, rect.y);
 }
 
 /**
@@ -20,13 +19,35 @@ void print_rect(char *name, rect_t rect) {
  * \param world les données du monde
  */
 void init_data(world_t *world) {
-    world->camera_offset = 0.0;
-    world->gameover = false;
-    world->speed = INITIAL_SPEED;
+    world->game_state = GAME_STATE_STARTED;
     world->last_frame_time = SDL_GetTicks64();
+    world->splash_screen_sound_channel = -1;
+    world->playing_time = 0;
+    world->current_level = 0;
+}
+
+/**
+ * \brief La fonction nettoie les données du monde
+ * \param world les données du monde
+ */
+void clean_data(world_t *world) {
+    if (world->game_state == GAME_STATE_PLAYING) {
+        free(world->murs);
+    }
+}
+
+void transition_to_splash_screen(resources_t *resources, world_t *world) {
+    world->game_state = GAME_STATE_SPLASH_SCREEN;
+    world->screen_time = 0;
+    world->splash_screen_sound_channel = play_sound(resources->splash_screen_sound);
+}
+
+void transition_to_playing(world_t *world) {
+    world->game_state = GAME_STATE_PLAYING;
+    world->camera_offset = 0.0;
+    world->speed = INITIAL_SPEED;
     world->has_won = false;
     world->invincible = false;
-    world->current_level = 1;
 
     int ship_x = SCREEN_WIDTH / 2;
     int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
@@ -36,83 +57,110 @@ void init_data(world_t *world) {
 
     // Initialisation du niveau
     init_level(world);
+    stop_sound(world->splash_screen_sound_channel);
 }
 
-/**
- * \brief La fonction nettoie les données du monde
- * \param world les données du monde
- */
-void clean_data(world_t *world) {
+void transition_to_level_complete_screen(world_t *world) {
+    world->game_state = GAME_STATE_LEVEL_COMPLETE_SCREEN;
+    world->screen_time = 0;
     free(world->murs);
+    printf("Level %d complete!\n", world->current_level + 1);
+}
+
+void transition_to_end_screen_loss(resources_t *resources, world_t *world) {
+    world->game_state = GAME_STATE_END_SCREEN;
+    world->screen_time = 0;
+    world->has_won = false;
+    free(world->murs);
+    printf("You lost!\n");
+    play_sound(resources->loss_sound);
+}
+
+void transition_to_end_screen_win(resources_t *resources, world_t *world) {
+    world->game_state = GAME_STATE_END_SCREEN;
+    world->screen_time = 0;
+    world->has_won = true;
+    free(world->murs);
+    printf("You finished in %.2f s!\n", world->playing_time / 1000.0);
+    play_sound(resources->win_sound);
+}
+
+void transition_to_quit(world_t *world) {
+    world->game_state = GAME_STATE_QUIT;
 }
 
 /**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param world les données du monde
  */
-void update_data(world_t *world) {
+void update_data(resources_t *resources, world_t *world) {
     world->time_since_last_frame = SDL_GetTicks64() - world->last_frame_time;
     world->last_frame_time = SDL_GetTicks64();
-    world->playing_time += world->time_since_last_frame;
 
-    if (world->gameover) {
-        return;
-    }
-
-    // Mise à jour de la position de la camera
-    world->camera_offset += world->speed * world->time_since_last_frame;
-
-    world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
-
-    // Gestion des mouvements
-    const Uint8 *keystate = SDL_GetKeyboardState(NULL);
-    if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q]) {
-        world->spaceship.x -= MOVING_STEP * world->time_since_last_frame;
-    }
-    if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D]) {
-        world->spaceship.x += MOVING_STEP * world->time_since_last_frame;
-    }
-    if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z]) {
-        world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
-    }
-    if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
-        world->spaceship.y += MOVING_STEP * world->time_since_last_frame;
-    }
-
-    // Collision avec la ligne d'arrivée
-    if (rects_collide(world->spaceship, world->ligne)) {
-        if (world->current_level < level_count) {
-            printf("Level %d complete!\n", world->current_level);
-            world->current_level++;
-            // Réinitialiser la position pour un nouveau niveau
-            int ship_x = SCREEN_WIDTH / 2;
-            int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
-            world->spaceship = (rect_t){ship_x, ship_y, SHIP_SIZE, SHIP_SIZE};
-            print_rect("spaceship", world->spaceship);
-            // Libérer la mémoire des murs du niveau précédent
-            free(world->murs);
-            // Réinitialisation du niveau
-            init_level(world);
-            world->camera_offset = 0.0;
-            return;
-        } else {
-            world->gameover = true;
-            world->has_won = true;
-            printf("You finished in %.2f s!\n", world->playing_time / 1000.0);
-            return;
+    if (world->game_state == GAME_STATE_STARTED) {
+        transition_to_splash_screen(resources, world);
+    } else if (world->game_state == GAME_STATE_SPLASH_SCREEN) {
+        world->screen_time += world->time_since_last_frame;
+        if (world->screen_time >= 3000) {
+            transition_to_playing(world);
         }
-    }
+    } else if (world->game_state == GAME_STATE_PLAYING) {
+        world->playing_time += world->time_since_last_frame;
 
-    world->spaceship.x = CLAMP(world->spaceship.x, world->spaceship.w / 2, SCREEN_WIDTH - world->spaceship.w / 2);
+        // Mise à jour de la position de la camera
+        world->camera_offset += world->speed * world->time_since_last_frame;
 
-    if (!world->invincible) {
-        // Collision entre le vaisseau et le mur de météorites
-        for (size_t i = 0; i < world->murs_count; i++) {
-            if (rects_collide(world->spaceship, world->murs[i])) {
-                world->gameover = true;
-                printf("You lost!\n");
-                return;
+        world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
+
+        // Gestion des mouvements
+        const Uint8 *keystate = SDL_GetKeyboardState(NULL);
+        if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q]) {
+            world->spaceship.x -= MOVING_STEP * world->time_since_last_frame;
+        }
+        if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D]) {
+            world->spaceship.x += MOVING_STEP * world->time_since_last_frame;
+        }
+        if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z]) {
+            world->spaceship.y -= MOVING_STEP * world->time_since_last_frame;
+        }
+        if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
+            world->spaceship.y += MOVING_STEP * world->time_since_last_frame;
+        }
+
+        world->spaceship.x = CLAMP(world->spaceship.x, world->spaceship.w / 2, SCREEN_WIDTH - world->spaceship.w / 2);
+
+        do {
+            // Collision avec la ligne d'arrivée
+            if (rects_collide(world->spaceship, world->ligne)) {
+                if (world->current_level == level_count - 1) {
+                    transition_to_end_screen_win(resources, world);
+                    break;
+                } else {
+                    transition_to_level_complete_screen(world);
+                    break;
+                }
             }
+
+            if (!world->invincible) {
+                // Collision entre le vaisseau et le mur de météorites
+                for (size_t i = 0; i < world->murs_count; i++) {
+                    if (rects_collide(world->spaceship, world->murs[i])) {
+                        transition_to_end_screen_loss(resources, world);
+                        break;
+                    }
+                }
+            }
+        } while (false);
+    } else if (world->game_state == GAME_STATE_LEVEL_COMPLETE_SCREEN) {
+        world->screen_time += world->time_since_last_frame;
+        if (world->screen_time >= 3000) {
+            world->current_level++;
+            transition_to_playing(world);
+        }
+    } else if (world->game_state == GAME_STATE_END_SCREEN) {
+        world->screen_time += world->time_since_last_frame;
+        if (world->screen_time >= 3000) {
+            transition_to_quit(world);
         }
     }
 }
@@ -127,15 +175,18 @@ void handle_events(world_t *world) {
         // Si l'utilisateur a cliqué sur le X de la fenêtre
         if (event.type == SDL_QUIT) {
             // On indique la fin du jeu
-            world->gameover = true;
+            transition_to_quit(world);
         }
         // Quitter (Echap)
         if (event.type == SDL_KEYDOWN) {
             if (event.key.keysym.sym == SDLK_ESCAPE) {
-                world->gameover = true;
+                transition_to_quit(world);
             }
-            if (event.key.keysym.sym == SDLK_i) {
+            if (event.key.keysym.sym == SDLK_i && world->game_state == GAME_STATE_PLAYING) {
                 world->invincible = !world->invincible;
+            }
+            if (event.key.keysym.sym == SDLK_SPACE && world->game_state == GAME_STATE_SPLASH_SCREEN) {
+                transition_to_playing(world);
             }
         }
     }

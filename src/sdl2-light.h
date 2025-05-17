@@ -18,7 +18,7 @@ void clean_sdl(SDL_Renderer *renderer, SDL_Window *window);
  * \return la surface SDL contenant l'image avec la couleur RGB (255,0,255) rendue transparente. Elle renvoie NULL si le chargement a échoué
  * (ex. le fichier path n'existe pas)
  */
-SDL_Texture *load_image(const char path[], SDL_Renderer *renderer);
+SDL_Texture *load_image(SDL_Renderer *renderer, const char *exe_path, const char *path);
 
 /**
  * \brief La fonction initialise la SDL.
@@ -48,11 +48,5 @@ void clear_renderer(SDL_Renderer *renderer);
  * \param renderer le renderer de l'écran
  */
 void update_screen(SDL_Renderer *renderer);
-
-/**
- * \brief La fonction met le programme en pause pendant un laps de temps
- * \param time ce laps de temps en milliseconde
- */
-void pause(int time);
 
 #endif

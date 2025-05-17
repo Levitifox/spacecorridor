@@ -75,62 +75,61 @@ void draw_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
  * \param world les données du monde
  * \param resources les ressources
  */
-void draw_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources) {
+void draw_graphics(SDL_Renderer *renderer, resources_t *resources, world_t *world) {
     clear_renderer(renderer);
 
-    int bg_w, bg_h;
-    SDL_QueryTexture(resources->background_texture, NULL, NULL, &bg_w, &bg_h);
-    int scroll_offset = (int)(world->camera_offset * BACKGROUND_SPEED) % bg_h;
-    draw_background(renderer, resources->background_texture, scroll_offset);
+    if (world->game_state == GAME_STATE_SPLASH_SCREEN) {
+        SDL_Rect dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}; // plein écran
+        SDL_RenderCopy(renderer, resources->splash_screen_texture, NULL, &dest);
+    }
 
-    SDL_SetTextureAlphaMod(resources->spaceship_texture, world->invincible ? 128 : 255);
-    draw_texture(renderer, resources->spaceship_texture, camera_transform(world, world->spaceship));
-    draw_texture(renderer, resources->finish_line_texture, camera_transform(world, world->ligne));
+    if (world->game_state == GAME_STATE_LEVEL_COMPLETE_SCREEN) {
+        draw_background(renderer, resources->background_texture, 0);
 
-    // Affichage d'un message entre les niveaux
-    {
-        static int last_level = 1;
-        if (!world->gameover && world->current_level > last_level) {
-            int center_x = SCREEN_WIDTH / 2 - 125;
-            int center_y = SCREEN_HEIGHT / 2;
+        char message[32];
+        sprintf(message, "Level %d complete!", world->current_level + 1);
+        draw_text(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, true, resources->font, message);
+    }
 
-            char message[32];
-            sprintf(message, "Level %d complete!", last_level);
-            draw_text(renderer, center_x, center_y, 150, 30, message, resources->font);
-            update_screen(renderer);
+    if (world->game_state == GAME_STATE_END_SCREEN) {
+        draw_background(renderer, resources->background_texture, 0);
 
-            pause(3000);
-            world->last_frame_time = SDL_GetTicks64();
-
-            last_level = world->current_level;
-            clear_renderer(renderer);
+        if (world->has_won) {
+            draw_text(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, true, resources->font, "You won!");
+        } else {
+            draw_text(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, true, resources->font, "You lost!");
         }
     }
 
-    // afficher les ressources uniquement si le jeu n'est pas terminé
-    if (!world->gameover) {
+    if (world->game_state == GAME_STATE_PLAYING) {
+        int bg_w, bg_h;
+        SDL_QueryTexture(resources->background_texture, NULL, NULL, &bg_w, &bg_h);
+        int scroll_offset = (int)(world->camera_offset * BACKGROUND_SPEED) % bg_h;
+        draw_background(renderer, resources->background_texture, scroll_offset);
+
+        SDL_SetTextureAlphaMod(resources->spaceship_texture, world->invincible ? 128 : 255);
+        draw_texture(renderer, resources->spaceship_texture, camera_transform(world, world->spaceship));
+        draw_texture(renderer, resources->finish_line_texture, camera_transform(world, world->ligne));
+
         draw_walls(renderer, world, resources->meteorite_texture);
-    }
 
-    /* Mise à jour du temps écoulé et affichage */
-    {
-        char timeText[64];
-        sprintf(timeText, "Time: %.2f s", world->playing_time / 1000.0);
-        // Affichage en haut à gauche
-        draw_text(renderer, 10, 10, 150, 30, timeText, resources->font);
-    }
-
-    /* Message de fin de partie */
-    if (world->gameover) {
-        int center_x = SCREEN_WIDTH / 2 - 75;
-        int center_y = SCREEN_HEIGHT / 2;
-        if (world->has_won) {
-            draw_text(renderer, center_x, center_y, 150, 30, "You won!", resources->font);
-        } else {
-            draw_text(renderer, center_x, center_y, 150, 30, "You lost!", resources->font);
+        /* Mise à jour du temps écoulé et affichage */
+        {
+            char timeText[64];
+            sprintf(timeText, "Time: %.2f s", world->playing_time / 1000.0);
+            // Affichage en haut à gauche
+            draw_text(renderer, 10, 10, false, resources->font, timeText);
         }
     }
 
     // Met à jour l'affichage
     update_screen(renderer);
+}
+
+void wait_for_next_frame(world_t *world) {
+    Uint64 now_time = SDL_GetTicks64();
+    Uint64 next_frame_time = world->last_frame_time + 1000 / MAX_FPS;
+    if (next_frame_time > now_time) {
+        SDL_Delay(next_frame_time - now_time);
+    }
 }

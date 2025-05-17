@@ -7,18 +7,76 @@
  */
 
 #include "resources.h"
+#include "utilities.h"
+
+void init_mix() {
+    if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
+        fprintf(stderr, "Mix_OpenAudio error: %s\n", Mix_GetError());
+    }
+}
+
+void clean_mix() {
+    Mix_CloseAudio();
+}
+
+/**
+ * \brief La fonction charge un son
+ * \param exe_path le chemin de l'exécutable, utilisé pour construire le chemin complet du fichier
+ * \param path le chemin du fichier correspondant au son
+ * \return le son chargé
+ */
+Mix_Chunk *load_sound(const char *exe_path, const char *path) {
+    char *full_path = exe_path != NULL ? concat_paths(exe_path, path) : strdup(path);
+    Mix_Chunk *sound = Mix_LoadWAV(full_path);
+    if (sound == NULL) {
+        fprintf(stderr, "Erreur pendant chargement du son : %s\n", Mix_GetError());
+    }
+    free(full_path);
+    return sound;
+}
+
+/**
+ * \brief Jouer un son
+ * \param sound le son à nettoyer
+ * \return le canal sur lequel le son est joué, ou -1 en cas d'erreur
+ */
+int play_sound(Mix_Chunk *sound) {
+    return Mix_PlayChannel(-1, sound, 0);
+}
+
+/**
+ * \brief Arrêter le son
+ * \param sound_channel le canal sur lequel le son est joué
+ */
+void stop_sound(int sound_channel) {
+    if (sound_channel != -1) {
+        Mix_HaltChannel(sound_channel);
+    }
+}
+
+/**
+ * \brief La fonction nettoie un son
+ * \param sound le son à nettoyer
+ */
+void clean_sound(Mix_Chunk *sound) {
+    Mix_FreeChunk(sound);
+}
 
 /**
  * \brief La fonction initialise les ressources nécessaires à l'affichage graphique du jeu
  * \param renderer le renderer correspondant à l'écran de jeu
  * \param resources Les ressources du jeu
  */
-void init_resources(SDL_Renderer *renderer, resources_t *resources) {
-    resources->background_texture = load_image("resources/background.png", renderer);
-    resources->spaceship_texture = load_image("resources/spaceship.png", renderer);
-    resources->finish_line_texture = load_image("resources/finish_line.png", renderer);
-    resources->meteorite_texture = load_image("resources/meteorite.png", renderer);
-    resources->font = load_font("resources/COOPBL.ttf", 28);
+void init_resources(const char *exe_dir, SDL_Renderer *renderer, resources_t *resources) {
+    resources->splash_screen_texture = load_image(renderer, exe_dir, "resources/splash_screen.png");
+    resources->background_texture = load_image(renderer, exe_dir, "resources/background.png");
+    resources->spaceship_texture = load_image(renderer, exe_dir, "resources/spaceship.png");
+    resources->finish_line_texture = load_image(renderer, exe_dir, "resources/finish_line.png");
+    resources->meteorite_texture = load_image(renderer, exe_dir, "resources/meteorite.png");
+    resources->font = load_font(exe_dir, "resources/COOPBL.ttf", 28);
+    resources->splash_screen_sound = load_sound(exe_dir, "resources/splash_screen.wav");
+    resources->loss_sound = load_sound(exe_dir, "resources/loss.wav");
+    resources->win_sound = load_sound(exe_dir, "resources/win.wav");
 }
 
 /**
@@ -26,9 +84,13 @@ void init_resources(SDL_Renderer *renderer, resources_t *resources) {
  * \param resources Les ressources
  */
 void clean_resources(resources_t *resources) {
+    clean_texture(resources->splash_screen_texture);
     clean_texture(resources->background_texture);
     clean_texture(resources->spaceship_texture);
     clean_texture(resources->finish_line_texture);
     clean_texture(resources->meteorite_texture);
     clean_font(resources->font);
+    clean_sound(resources->splash_screen_sound);
+    clean_sound(resources->loss_sound);
+    clean_sound(resources->win_sound);
 }

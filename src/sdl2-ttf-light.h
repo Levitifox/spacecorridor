@@ -3,12 +3,13 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
+#include <stdbool.h>
 
 void init_ttf();
 
-TTF_Font *load_font(const char *path, int font_size);
+TTF_Font *load_font(const char *exe_path, const char *path, int font_size);
 
-void draw_text(SDL_Renderer *renderer, int x, int y, int w, int h, const char *text, TTF_Font *font);
+void draw_text(SDL_Renderer *renderer, double x, double y, bool center, TTF_Font *font, const char *text);
 
 void clean_font(TTF_Font *font);
 

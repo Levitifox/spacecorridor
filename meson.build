@@ -2,7 +2,7 @@ project(
     'spacecorridor',
     'c',
     version: '0.1',
-    default_options: ['warning_level=3'],
+    default_options: ['warning_level=3'],  # 'b_sanitize=address,undefined'
 )
 
 sdl2 = dependency('sdl2', required: true)
@@ -20,9 +20,19 @@ executable(
         'src/level.c',
         'src/resources.c',
         'src/sdl2-ttf-light.c',
+        'src/utilities.c',
     ],
     dependencies: [sdl2, sdl2_image, sdl2_ttf, sdl2_mixer],
     install: true,
+)
+
+cp = find_program('cp', required: true)
+
+custom_target(
+    'resources',
+    output: 'resources',
+    command: [cp, '-r', meson.project_source_root() / 'resources', '@OUTPUT@'],
+    build_by_default: true,
 )
 
 doxygen = find_program('doxygen', required: false)

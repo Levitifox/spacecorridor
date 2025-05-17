@@ -21,6 +21,8 @@ void draw_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_of
 
 void draw_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture);
 
-void draw_graphics(SDL_Renderer *renderer, world_t *world, resources_t *resources);
+void draw_graphics(SDL_Renderer *renderer, resources_t *resources, world_t *world);
+
+void wait_for_next_frame(world_t *world);
 
 #endif
