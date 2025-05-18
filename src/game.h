@@ -37,6 +37,7 @@ typedef enum game_state_e game_state_t;
  * \brief Représentation du monde du jeu
  */
 typedef struct world_s {
+    int level_count;
     game_state_t game_state;
     Uint64 last_frame_time;       /*!< Temps de la dernière frame rendue */
     Uint64 time_since_last_frame; /*!< Temps écoulé depuis la dernière frame */
@@ -56,13 +57,13 @@ typedef struct world_s {
 
 void print_rect(char *name, rect_t rect);
 
-void init_data(world_t *world);
+void init_data(const char *exe_dir, world_t *world);
 
 void clean_data(world_t *world);
 
-void update_data(resources_t *resources, world_t *world);
+void update_data(const char *exe_dir, resources_t *resources, world_t *world);
 
-void handle_events(world_t *world);
+void handle_events(const char *exe_dir, world_t *world);
 
 bool rects_collide(rect_t rect_1, rect_t rect_2);
 

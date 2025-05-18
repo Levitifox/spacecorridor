@@ -25,6 +25,8 @@ TTF_Font *load_font(const char *exe_path, const char *path, int font_size) {
     TTF_Font *font = TTF_OpenFont(full_path, font_size);
     if (font == NULL) {
         fprintf(stderr, "Erreur pendant chargement de la police : %s\n", TTF_GetError());
+        free(full_path);
+        return NULL;
     }
     free(full_path);
     return font;

@@ -11,8 +11,8 @@
 
 #include "game.h"
 
-extern const int level_count;
+void init_levels(const char *exe_dir, world_t *world);
 
-void init_level(world_t *world);
+void init_level(const char *exe_dir, world_t *world);
 
 #endif

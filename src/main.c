@@ -13,6 +13,7 @@
 
 /**
  * \brief fonction qui initialise le jeu: initialisation de la partie graphique (SDL), chargement des ressources, initialisation des données
+ * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
  * \param window la fenêtre du jeu
  * \param renderer le renderer
  * \param resources les ressources
@@ -23,7 +24,7 @@ void init(const char *exe_dir, SDL_Window **window, SDL_Renderer **renderer, res
     init_mix();
     SDL_SetWindowTitle(*window, "Spacecorridor"); // Définir le titre de la fenêtre
     init_resources(exe_dir, *renderer, resources);
-    init_data(world);
+    init_data(exe_dir, world);
 }
 
 /**
@@ -46,7 +47,7 @@ void clean(SDL_Window *window, SDL_Renderer *renderer, resources_t *resources, w
  */
 int main(int argc, char **argv) {
     if (argc == 0) {
-        fprintf(stderr, "Program location required\n");
+        fprintf(stderr, "Chemin du programme requis\n");
         exit(1);
     }
 
@@ -60,14 +61,13 @@ int main(int argc, char **argv) {
     char *exe_dir = strdup(dirname(exe_path));
     free(exe_path);
     init(exe_dir, &window, &renderer, &resources, &world);
-    free(exe_dir);
 
     while (true) {
         // gestion des évènements
-        handle_events(&world);
+        handle_events(exe_dir, &world);
 
         // mise à jour des données liée à la physique du monde
-        update_data(&resources, &world);
+        update_data(exe_dir, &resources, &world);
         if (world.game_state == GAME_STATE_QUIT) { // tant que le jeu n'est pas fini
             break;
         }
@@ -80,6 +80,7 @@ int main(int argc, char **argv) {
 
     // nettoyage final
     clean(window, renderer, &resources, &world);
+    free(exe_dir);
 
     return 0;
 }

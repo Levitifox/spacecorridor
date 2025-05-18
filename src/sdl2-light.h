@@ -3,50 +3,20 @@
 
 #include <SDL.h>
 #include <SDL_image.h>
+#include <stdbool.h>
 
-/**
- * \brief La fonction nettoie le renderer et la fenêtre du jeu en mémoire
- * \param renderer le renderer à nettoyer
- * \param window la fenêtre à nettoyer
- */
 void clean_sdl(SDL_Renderer *renderer, SDL_Window *window);
 
-/**
- * \brief La fonction charge une image  et renvoie la texture correspondante où la couleur RGB (255, 0, 255) est rendue transparente.
- * \param path est le chemin du fichier image. Le fichier doit être obligatoirement du BMP.
- * \param renderer le renderer
- * \return la surface SDL contenant l'image avec la couleur RGB (255,0,255) rendue transparente. Elle renvoie NULL si le chargement a échoué
- * (ex. le fichier path n'existe pas)
- */
-SDL_Texture *load_image(SDL_Renderer *renderer, const char *exe_path, const char *path);
+SDL_Texture *load_image(SDL_Renderer *renderer, const char *exe_path, const char *path, SDL_Surface **image_surface_out, bool *success);
 
-/**
- * \brief La fonction initialise la SDL.
- * Elle crée la fenêtre du jeu ainsi que le renderer
- *  \param window la fenêtre du jeu
- *  \param renderer le renderer
- * \param width largeur de l'écran de jeu
- * \param height hauteur de l'écran de jeu
- * \return -1 en cas d'erreur, 0 sinon
- */
 int init_sdl(SDL_Window **window, SDL_Renderer **renderer, int width, int height);
 
-/**
- * \brief La fonction nettoie une texture en mémoire
- * \param texture la texture à nettoyer
- */
+Uint32 get_pixel_RGBA32(SDL_Surface *surface, size_t x, size_t y);
+
 void clean_texture(SDL_Texture *texture);
 
-/**
- * \brief La fonction vide le contenu graphique du renderer lié à l'écran de jeu
- * \param renderer le renderer de l'écran
- */
 void clear_renderer(SDL_Renderer *renderer);
 
-/**
- * \brief La fonction met à jour l'écran avec le contenu du renderer
- * \param renderer le renderer de l'écran
- */
 void update_screen(SDL_Renderer *renderer);
 
 #endif

@@ -11,7 +11,7 @@
 
 void init_mix() {
     if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == -1) {
-        fprintf(stderr, "Mix_OpenAudio error: %s\n", Mix_GetError());
+        fprintf(stderr, "Erreur en Mix_OpenAudio : %s\n", Mix_GetError());
     }
 }
 
@@ -29,7 +29,9 @@ Mix_Chunk *load_sound(const char *exe_path, const char *path) {
     char *full_path = exe_path != NULL ? concat_paths(exe_path, path) : strdup(path);
     Mix_Chunk *sound = Mix_LoadWAV(full_path);
     if (sound == NULL) {
+        free(full_path);
         fprintf(stderr, "Erreur pendant chargement du son : %s\n", Mix_GetError());
+        return NULL;
     }
     free(full_path);
     return sound;
@@ -64,15 +66,16 @@ void clean_sound(Mix_Chunk *sound) {
 
 /**
  * \brief La fonction initialise les ressources nécessaires à l'affichage graphique du jeu
+ * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
  * \param renderer le renderer correspondant à l'écran de jeu
  * \param resources Les ressources du jeu
  */
 void init_resources(const char *exe_dir, SDL_Renderer *renderer, resources_t *resources) {
-    resources->splash_screen_texture = load_image(renderer, exe_dir, "resources/splash_screen.png");
-    resources->background_texture = load_image(renderer, exe_dir, "resources/background.png");
-    resources->spaceship_texture = load_image(renderer, exe_dir, "resources/spaceship.png");
-    resources->finish_line_texture = load_image(renderer, exe_dir, "resources/finish_line.png");
-    resources->meteorite_texture = load_image(renderer, exe_dir, "resources/meteorite.png");
+    resources->splash_screen_texture = load_image(renderer, exe_dir, "resources/splash_screen.png", NULL, NULL);
+    resources->background_texture = load_image(renderer, exe_dir, "resources/background.png", NULL, NULL);
+    resources->spaceship_texture = load_image(renderer, exe_dir, "resources/spaceship.png", NULL, NULL);
+    resources->finish_line_texture = load_image(renderer, exe_dir, "resources/finish_line.png", NULL, NULL);
+    resources->meteorite_texture = load_image(renderer, exe_dir, "resources/meteorite.png", NULL, NULL);
     resources->font = load_font(exe_dir, "resources/COOPBL.ttf", 28);
     resources->splash_screen_sound = load_sound(exe_dir, "resources/splash_screen.wav");
     resources->loss_sound = load_sound(exe_dir, "resources/loss.wav");

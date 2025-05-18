@@ -16,9 +16,11 @@ void print_rect(char *name, rect_t rect) {
 
 /**
  * \brief La fonction initialise les données du monde du jeu
+ * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
  * \param world les données du monde
  */
-void init_data(world_t *world) {
+void init_data(const char *exe_dir, world_t *world) {
+    init_levels(exe_dir, world);
     world->game_state = GAME_STATE_STARTED;
     world->last_frame_time = SDL_GetTicks64();
     world->splash_screen_sound_channel = -1;
@@ -46,7 +48,7 @@ void transition_to_splash_screen(resources_t *resources, world_t *world) {
     world->splash_screen_sound_channel = play_sound(resources->splash_screen_sound);
 }
 
-void transition_to_playing(world_t *world) {
+void transition_to_playing(const char *exe_dir, world_t *world) {
     world->game_state = GAME_STATE_PLAYING;
     world->camera_offset = 0.0;
     world->speed = INITIAL_SPEED;
@@ -60,7 +62,7 @@ void transition_to_playing(world_t *world) {
     print_rect("spaceship", world->spaceship_rect);
 
     // Initialisation du niveau
-    init_level(world);
+    init_level(exe_dir, world);
     stop_sound(world->splash_screen_sound_channel);
 }
 
@@ -95,9 +97,10 @@ void transition_to_quit(world_t *world) {
 
 /**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
+ * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
  * \param world les données du monde
  */
-void update_data(resources_t *resources, world_t *world) {
+void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
     world->time_since_last_frame = SDL_GetTicks64() - world->last_frame_time;
     world->last_frame_time = SDL_GetTicks64();
 
@@ -106,7 +109,7 @@ void update_data(resources_t *resources, world_t *world) {
     } else if (world->game_state == GAME_STATE_SPLASH_SCREEN) {
         world->screen_time += world->time_since_last_frame;
         if (world->screen_time >= 3000) {
-            transition_to_playing(world);
+            transition_to_playing(exe_dir, world);
         }
     } else if (world->game_state == GAME_STATE_PLAYING) {
         world->playing_time += world->time_since_last_frame;
@@ -136,7 +139,7 @@ void update_data(resources_t *resources, world_t *world) {
         do {
             // Collision avec la ligne d'arrivée
             if (rects_collide(world->spaceship_rect, world->finish_line_rect)) {
-                if (world->current_level == level_count - 1) {
+                if (world->current_level == world->level_count - 1) {
                     transition_to_end_screen_win(resources, world);
                     break;
                 } else {
@@ -159,7 +162,7 @@ void update_data(resources_t *resources, world_t *world) {
         world->screen_time += world->time_since_last_frame;
         if (world->screen_time >= 3000) {
             world->current_level++;
-            transition_to_playing(world);
+            transition_to_playing(exe_dir, world);
         }
     } else if (world->game_state == GAME_STATE_END_SCREEN) {
         world->screen_time += world->time_since_last_frame;
@@ -171,9 +174,10 @@ void update_data(resources_t *resources, world_t *world) {
 
 /**
  * \brief La fonction gère les évènements ayant eu lieu et qui n'ont pas encore été traités
+ * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
  * \param world les données du monde
  */
-void handle_events(world_t *world) {
+void handle_events(const char *exe_dir, world_t *world) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         // Si l'utilisateur a cliqué sur le X de la fenêtre
@@ -190,7 +194,7 @@ void handle_events(world_t *world) {
                 world->invincible = !world->invincible;
             }
             if (event.key.keysym.sym == SDLK_SPACE && world->game_state == GAME_STATE_SPLASH_SCREEN) {
-                transition_to_playing(world);
+                transition_to_playing(exe_dir, world);
             }
         }
     }
