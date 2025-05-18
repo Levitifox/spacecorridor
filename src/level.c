@@ -1,6 +1,6 @@
 /**
  * \file level.c
- * \brief Fichier contenant l'implémentation de l'initialisation de la ligne d'arrivée et des murs selon le niveau courant
+ * \brief Fichier les fonctions pour l'initialisation des niveaux du jeu
  * \author DANILKIN Artem, RUSCUK Emre
  * \version 1.0
  * \date 14 mai 2025
@@ -13,72 +13,77 @@
 
 const int level_count = 3;
 
-/* positions des murs pour chaque niveau */
-/* clang-format off */
-static const int wall_positions_lvl0[][4] = {
-    {48, 0, 96, 192},
-    {252, 0, 96, 192},
-    {16, -352, 32, 160},
-    {188, -352, 224, 160},
-    {48, -672, 96, 192},
-    {252, -672, 96, 192}
+static const int meteorite_positions_level_0[][2] = {
+    {16, -80},   {48, -80},   {80, -80},   {16, -48},   {48, -48},   {80, -48},   {16, -16},   {48, -16},   {80, -16},   {16, 16},    {48, 16},    {80, 16},
+    {16, 48},    {48, 48},    {80, 48},    {16, 80},    {48, 80},    {80, 80},    {220, -80},  {252, -80},  {284, -80},  {220, -48},  {252, -48},  {284, -48},
+    {220, -16},  {252, -16},  {284, -16},  {220, 16},   {252, 16},   {284, 16},   {220, 48},   {252, 48},   {284, 48},   {220, 80},   {252, 80},   {284, 80},
+    {16, -416},  {16, -384},  {16, -352},  {16, -320},  {16, -288},  {92, -416},  {124, -416}, {156, -416}, {188, -416}, {220, -416}, {252, -416}, {284, -416},
+    {92, -384},  {124, -384}, {156, -384}, {188, -384}, {220, -384}, {252, -384}, {284, -384}, {92, -352},  {124, -352}, {156, -352}, {188, -352}, {220, -352},
+    {252, -352}, {284, -352}, {92, -320},  {124, -320}, {156, -320}, {188, -320}, {220, -320}, {252, -320}, {284, -320}, {92, -288},  {124, -288}, {156, -288},
+    {188, -288}, {220, -288}, {252, -288}, {284, -288}, {16, -752},  {48, -752},  {80, -752},  {16, -720},  {48, -720},  {80, -720},  {16, -688},  {48, -688},
+    {80, -688},  {16, -656},  {48, -656},  {80, -656},  {16, -624},  {48, -624},  {80, -624},  {16, -592},  {48, -592},  {80, -592},  {220, -752}, {252, -752},
+    {284, -752}, {220, -720}, {252, -720}, {284, -720}, {220, -688}, {252, -688}, {284, -688}, {220, -656}, {252, -656}, {284, -656}, {220, -624}, {252, -624},
+    {284, -624}, {220, -592}, {252, -592}, {284, -592},
 };
-static const int wall_positions_lvl1[][4] = {
-    {80, 0, 160, 224},
-    {268, 0, 64, 224},
-    {32, -352, 64, 192},
-    {220, -352, 160, 192},
-    {112, -704, 224, 192}
+static const int meteorite_positions_level_1[][2] = {
+    {16, -96},   {48, -96},   {80, -96},   {112, -96},  {144, -96},  {16, -64},   {48, -64},   {80, -64},   {112, -64},  {144, -64},  {16, -32},   {48, -32},
+    {80, -32},   {112, -32},  {144, -32},  {16, 0},     {48, 0},     {80, 0},     {112, 0},    {144, 0},    {16, 32},    {48, 32},    {80, 32},    {112, 32},
+    {144, 32},   {16, 64},    {48, 64},    {80, 64},    {112, 64},   {144, 64},   {16, 96},    {48, 96},    {80, 96},    {112, 96},   {144, 96},   {252, -96},
+    {284, -96},  {252, -64},  {284, -64},  {252, -32},  {284, -32},  {252, 0},    {284, 0},    {252, 32},   {284, 32},   {252, 64},   {284, 64},   {252, 96},
+    {284, 96},   {16, -432},  {48, -432},  {16, -400},  {48, -400},  {16, -368},  {48, -368},  {16, -336},  {48, -336},  {16, -304},  {48, -304},  {16, -272},
+    {48, -272},  {156, -432}, {188, -432}, {220, -432}, {252, -432}, {284, -432}, {156, -400}, {188, -400}, {220, -400}, {252, -400}, {284, -400}, {156, -368},
+    {188, -368}, {220, -368}, {252, -368}, {284, -368}, {156, -336}, {188, -336}, {220, -336}, {252, -336}, {284, -336}, {156, -304}, {188, -304}, {220, -304},
+    {252, -304}, {284, -304}, {156, -272}, {188, -272}, {220, -272}, {252, -272}, {284, -272}, {16, -784},  {48, -784},  {80, -784},  {112, -784}, {144, -784},
+    {176, -784}, {208, -784}, {16, -752},  {48, -752},  {80, -752},  {112, -752}, {144, -752}, {176, -752}, {208, -752}, {16, -720},  {48, -720},  {80, -720},
+    {112, -720}, {144, -720}, {176, -720}, {208, -720}, {16, -688},  {48, -688},  {80, -688},  {112, -688}, {144, -688}, {176, -688}, {208, -688}, {16, -656},
+    {48, -656},  {80, -656},  {112, -656}, {144, -656}, {176, -656}, {208, -656}, {16, -624},  {48, -624},  {80, -624},  {112, -624}, {144, -624}, {176, -624},
+    {208, -624},
 };
-static const int wall_positions_lvl2[][4] = {
-    {64, 32, 128, 128},
-    {48, -48, 96, 32},
-    {252, -48, 96, 32},
-    {236, 32, 128, 128},
-    {150, -256, 96, 160},
-    {48, -480, 96, 32},
-    {252, -480, 96, 32},
-    {64, -560, 128, 128},
-    {236, -560, 128, 128}
+static const int meteorite_positions_level_2[][2] = {
+    {16, -16},   {48, -16},   {80, -16},   {112, -16},  {16, 16},    {48, 16},    {80, 16},    {112, 16},   {16, 48},    {48, 48},    {80, 48},    {112, 48},
+    {16, 80},    {48, 80},    {80, 80},    {112, 80},   {16, -48},   {48, -48},   {80, -48},   {220, -48},  {252, -48},  {284, -48},  {188, -16},  {220, -16},
+    {252, -16},  {284, -16},  {188, 16},   {220, 16},   {252, 16},   {284, 16},   {188, 48},   {220, 48},   {252, 48},   {284, 48},   {188, 80},   {220, 80},
+    {252, 80},   {284, 80},   {118, -320}, {150, -320}, {182, -320}, {118, -288}, {150, -288}, {182, -288}, {118, -256}, {150, -256}, {182, -256}, {118, -224},
+    {150, -224}, {182, -224}, {118, -192}, {150, -192}, {182, -192}, {16, -480},  {48, -480},  {80, -480},  {220, -480}, {252, -480}, {284, -480}, {16, -608},
+    {48, -608},  {80, -608},  {112, -608}, {16, -576},  {48, -576},  {80, -576},  {112, -576}, {16, -544},  {48, -544},  {80, -544},  {112, -544}, {16, -512},
+    {48, -512},  {80, -512},  {112, -512}, {188, -608}, {220, -608}, {252, -608}, {284, -608}, {188, -576}, {220, -576}, {252, -576}, {284, -576}, {188, -544},
+    {220, -544}, {252, -544}, {284, -544}, {188, -512}, {220, -512}, {252, -512}, {284, -512},
 };
-/* clang-format on */
 
 /**
  * \brief Initialise les éléments du niveau selon le niveau courant
  * \param world Les données du monde
  */
 void init_level(world_t *world) {
-    const int (*wall_positions)[4] = NULL;
+    const int (*meteorite_positions)[2] = NULL;
     int finish_line_y = 0;
-    size_t murs_count;
 
     if (world->current_level == 0) {
         // Niveau 1
         finish_line_y = -960;
-        wall_positions = wall_positions_lvl0;
-        murs_count = sizeof wall_positions_lvl0 / sizeof wall_positions_lvl0[0];
+        meteorite_positions = meteorite_positions_level_0;
+        world->meteorites_count = sizeof meteorite_positions_level_0 / sizeof meteorite_positions_level_0[0];
     } else if (world->current_level == 1) {
         // Niveau 2
         finish_line_y = -960;
-        wall_positions = wall_positions_lvl1;
-        murs_count = sizeof wall_positions_lvl1 / sizeof wall_positions_lvl1[0];
+        meteorite_positions = meteorite_positions_level_1;
+        world->meteorites_count = sizeof meteorite_positions_level_1 / sizeof meteorite_positions_level_1[0];
     } else if (world->current_level == 2) {
         // Niveau 3
         finish_line_y = -850;
-        wall_positions = wall_positions_lvl2;
-        murs_count = sizeof wall_positions_lvl2 / sizeof wall_positions_lvl2[0];
+        meteorite_positions = meteorite_positions_level_2;
+        world->meteorites_count = sizeof meteorite_positions_level_2 / sizeof meteorite_positions_level_2[0];
     } else {
         fprintf(stderr, "Level not found: %d\n", world->current_level);
         exit(1);
     }
 
-    world->ligne = (rect_t){SCREEN_WIDTH / 2, finish_line_y, SCREEN_WIDTH, FINISH_LINE_HEIGHT};
-    print_rect("ligne", world->ligne);
+    world->finish_line_rect = (rect_t){SCREEN_WIDTH / 2, finish_line_y, SCREEN_WIDTH, FINISH_LINE_HEIGHT};
+    print_rect("ligne", world->finish_line_rect);
 
-    world->murs_count = murs_count;
-    world->murs = malloc(sizeof(rect_t) * murs_count);
-    for (size_t i = 0; i < murs_count; i++) {
-        world->murs[i] = (rect_t){wall_positions[i][0], wall_positions[i][1], wall_positions[i][2], wall_positions[i][3]};
-        print_rect("mur", world->murs[i]);
+    world->meteorite_rects = malloc(sizeof(rect_t) * world->meteorites_count);
+    for (size_t i = 0; i < world->meteorites_count; i++) {
+        world->meteorite_rects[i] = (rect_t){meteorite_positions[i][0], meteorite_positions[i][1], METEORITE_SIZE, METEORITE_SIZE};
+        print_rect("meteorite", world->meteorite_rects[i]);
     }
 }

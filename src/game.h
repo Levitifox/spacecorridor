@@ -46,12 +46,12 @@ typedef struct world_s {
     int current_level;   /*!< Niveau actuel du joueur */
     double camera_offset;
     double speed; /*!< Vitesse du déplacement dans le jeu */
-    rect_t spaceship;
-    rect_t ligne; /*!< La ligne d'arrivée */
-    size_t murs_count;
-    rect_t *murs;    /*!< Tableau de murs de météorites */
-    bool invincible; /*!< Indique si le joueur est dans un mode invincible */
-    bool has_won;    /*!< Indique si le joueur a gagné */
+    rect_t spaceship_rect;
+    rect_t finish_line_rect; /*!< La ligne d'arrivée */
+    size_t meteorites_count;
+    rect_t *meteorite_rects; /*!< Tableau de météorites */
+    bool invincible;         /*!< Indique si le joueur est dans un mode invincible */
+    bool has_won;            /*!< Indique si le joueur a gagné */
 } world_t;
 
 void print_rect(char *name, rect_t rect);

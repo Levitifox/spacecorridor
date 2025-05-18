@@ -37,39 +37,6 @@ void draw_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_of
 }
 
 /**
- * \brief Applique les murs de météorites sur le renderer
- * \param renderer Le renderer
- * \param world Les données du monde
- * \param texture La texture des murs
- */
-void draw_walls(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture) {
-    for (size_t i = 0; i < world->murs_count; i++) {
-        // calculer le nombre de météorites à dessiner horizontalement et verticalement
-        int num_meteos_x = world->murs[i].w / METEORITE_SIZE;
-        int num_meteos_y = world->murs[i].h / METEORITE_SIZE;
-
-        // calculer les positions x et y de départ des météorites
-        double start_x = world->murs[i].x - world->murs[i].w / 2;
-        double start_y = world->murs[i].y - world->murs[i].h / 2;
-
-        // dessine les météorites
-        for (int j = 0; j < num_meteos_y; j++) {
-            for (int k = 0; k < num_meteos_x; k++) {
-                /* clang-format off */
-                rect_t rect = {
-                    start_x + k * METEORITE_SIZE + METEORITE_SIZE / 2,
-                    start_y + j * METEORITE_SIZE + METEORITE_SIZE / 2,
-                    METEORITE_SIZE,
-                    METEORITE_SIZE,
-                };
-                /* clang-format on */
-                draw_texture(renderer, texture, camera_transform(world, rect));
-            }
-        }
-    }
-}
-
-/**
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
  * \param renderer le renderer lié à l'écran de jeu
  * \param world les données du monde
@@ -108,10 +75,13 @@ void draw_graphics(SDL_Renderer *renderer, resources_t *resources, world_t *worl
         draw_background(renderer, resources->background_texture, scroll_offset);
 
         SDL_SetTextureAlphaMod(resources->spaceship_texture, world->invincible ? 128 : 255);
-        draw_texture(renderer, resources->spaceship_texture, camera_transform(world, world->spaceship));
-        draw_texture(renderer, resources->finish_line_texture, camera_transform(world, world->ligne));
+        draw_texture(renderer, resources->spaceship_texture, camera_transform(world, world->spaceship_rect));
 
-        draw_walls(renderer, world, resources->meteorite_texture);
+        draw_texture(renderer, resources->finish_line_texture, camera_transform(world, world->finish_line_rect));
+
+        for (size_t i = 0; i < world->meteorites_count; i++) {
+            draw_texture(renderer, resources->meteorite_texture, camera_transform(world, world->meteorite_rects[i]));
+        }
 
         /* Mise à jour du temps écoulé et affichage */
         {
