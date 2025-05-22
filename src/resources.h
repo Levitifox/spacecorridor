@@ -22,10 +22,10 @@ typedef struct resources_s {
     SDL_Texture *spaceship_texture;
     SDL_Texture *finish_line_texture;
     SDL_Texture *meteorite_texture;
-    TTF_Font *font;
     Mix_Chunk *splash_screen_sound;
     Mix_Chunk *loss_sound;
     Mix_Chunk *win_sound;
+    TTF_Font *font;
 } resources_t;
 
 void init_mix();
@@ -41,6 +41,8 @@ void stop_sound(int sound_channel);
 void clean_sound(Mix_Chunk *sound);
 
 void init_resources(const char *exe_dir, SDL_Renderer *renderer, resources_t *resources);
+
+void refresh_font(const char *exe_dir, resources_t *resources, int font_size);
 
 void clean_resources(resources_t *resources);
 

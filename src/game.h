@@ -43,10 +43,11 @@ typedef struct world_s {
     Uint64 time_since_last_frame; /*!< Temps écoulé depuis la dernière frame */
     Uint64 screen_time;
     int splash_screen_sound_channel;
-    Uint64 playing_time; /*!< Temps écoulé */
-    int current_level;   /*!< Niveau actuel du joueur */
-    double camera_offset;
-    double speed; /*!< Vitesse du déplacement dans le jeu */
+    Uint64 playing_time;  /*!< Temps écoulé */
+    int current_level;    /*!< Niveau actuel du joueur */
+    double level_width;   /*!< Largeur du niveau */
+    double level_height;  /*!< Hauteur du niveau */
+    double camera_offset; /*!< Décalage de la caméra */
     rect_t spaceship_rect;
     rect_t finish_line_rect; /*!< La ligne d'arrivée */
     size_t meteorites_count;

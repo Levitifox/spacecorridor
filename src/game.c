@@ -9,6 +9,7 @@
 #include "game.h"
 #include "constants.h"
 #include "level.h"
+#include "utilities.h"
 
 void print_rect(char *name, rect_t rect) {
     printf("Rect \"%s\" : %gx%g%+g%+g\n", name, rect.w, rect.h, rect.x, rect.y);
@@ -45,24 +46,22 @@ void clean_data(world_t *world) {
 void transition_to_splash_screen(resources_t *resources, world_t *world) {
     world->game_state = GAME_STATE_SPLASH_SCREEN;
     world->screen_time = 0;
+    world->level_width = 1.0;
+    world->level_height = 1.0;
     world->splash_screen_sound_channel = play_sound(resources->splash_screen_sound);
 }
 
 void transition_to_playing(const char *exe_dir, world_t *world) {
     world->game_state = GAME_STATE_PLAYING;
-    world->camera_offset = 0.0;
-    world->speed = INITIAL_SPEED;
+    world->camera_offset = INITIAL_CAMERA_OFFSET;
     world->has_won = false;
     world->invincible = false;
 
-    int ship_x = SCREEN_WIDTH / 2;
-    int ship_y = SCREEN_HEIGHT - SHIP_SIZE;
-
-    world->spaceship_rect = (rect_t){ship_x, ship_y, SHIP_SIZE, SHIP_SIZE};
+    world->spaceship_rect = (rect_t){0, 0, SHIP_SIZE, SHIP_SIZE};
     print_rect("spaceship", world->spaceship_rect);
 
-    // Initialisation du niveau
     init_level(exe_dir, world);
+
     stop_sound(world->splash_screen_sound_channel);
 }
 
@@ -114,27 +113,27 @@ void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
     } else if (world->game_state == GAME_STATE_PLAYING) {
         world->playing_time += world->time_since_last_frame;
 
-        // Mise à jour de la position de la camera
-        world->camera_offset += world->speed * world->time_since_last_frame;
-
-        world->spaceship_rect.y -= MOVING_STEP * world->time_since_last_frame;
+        // Mise à jour de la position de la camera et du vaisseau (de même valeur)
+        world->camera_offset += CRUSING_SPEED * world->time_since_last_frame;
+        world->spaceship_rect.y -= CRUSING_SPEED * world->time_since_last_frame;
 
         // Gestion des mouvements
         const Uint8 *keystate = SDL_GetKeyboardState(NULL);
         if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q]) {
-            world->spaceship_rect.x -= MOVING_STEP * world->time_since_last_frame;
+            world->spaceship_rect.x -= MOVING_SPEED * world->time_since_last_frame;
         }
         if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D]) {
-            world->spaceship_rect.x += MOVING_STEP * world->time_since_last_frame;
+            world->spaceship_rect.x += MOVING_SPEED * world->time_since_last_frame;
         }
         if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z]) {
-            world->spaceship_rect.y -= MOVING_STEP * world->time_since_last_frame;
+            world->spaceship_rect.y -= MOVING_SPEED * world->time_since_last_frame;
         }
         if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
-            world->spaceship_rect.y += MOVING_STEP * world->time_since_last_frame;
+            world->spaceship_rect.y += MOVING_SPEED * world->time_since_last_frame;
         }
 
-        world->spaceship_rect.x = CLAMP(world->spaceship_rect.x, world->spaceship_rect.w / 2, SCREEN_WIDTH - world->spaceship_rect.w / 2);
+        world->spaceship_rect.x =
+            CLAMP(world->spaceship_rect.x, -world->level_width / 2 + world->spaceship_rect.w / 2, world->level_width / 2 - world->spaceship_rect.w / 2);
 
         do {
             // Collision avec la ligne d'arrivée

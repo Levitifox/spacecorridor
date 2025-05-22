@@ -76,10 +76,23 @@ void init_resources(const char *exe_dir, SDL_Renderer *renderer, resources_t *re
     resources->spaceship_texture = load_image(renderer, exe_dir, "resources/spaceship.png", NULL, NULL);
     resources->finish_line_texture = load_image(renderer, exe_dir, "resources/finish_line.png", NULL, NULL);
     resources->meteorite_texture = load_image(renderer, exe_dir, "resources/meteorite.png", NULL, NULL);
-    resources->font = load_font(exe_dir, "resources/COOPBL.ttf", 28);
     resources->splash_screen_sound = load_sound(exe_dir, "resources/splash_screen.wav");
     resources->loss_sound = load_sound(exe_dir, "resources/loss.wav");
     resources->win_sound = load_sound(exe_dir, "resources/win.wav");
+    resources->font = NULL;
+}
+
+/**
+ * \brief La fonction rafraichit la police. Peut être appelée plusieurs fois et utilisée pour changer la taille de la police
+ * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
+ * \param resources Les ressources du jeu
+ * \param font_size La taille de la police
+ */
+void refresh_font(const char *exe_dir, resources_t *resources, int font_size) {
+    if (resources->font != NULL) {
+        clean_font(resources->font);
+    }
+    resources->font = load_font(exe_dir, "resources/COOPBL.ttf", font_size);
 }
 
 /**
@@ -92,8 +105,10 @@ void clean_resources(resources_t *resources) {
     clean_texture(resources->spaceship_texture);
     clean_texture(resources->finish_line_texture);
     clean_texture(resources->meteorite_texture);
-    clean_font(resources->font);
     clean_sound(resources->splash_screen_sound);
     clean_sound(resources->loss_sound);
     clean_sound(resources->win_sound);
+    if (resources->font != NULL) {
+        clean_font(resources->font);
+    }
 }

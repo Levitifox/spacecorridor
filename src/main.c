@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
         }
 
         // rafraichissement de l'écran
-        draw_graphics(renderer, &resources, &world);
+        draw_graphics(exe_dir, renderer, &resources, &world);
 
         wait_for_next_frame(&world);
     }

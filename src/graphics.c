@@ -11,9 +11,15 @@
 #include "game.h"
 #include "sdl2-light.h"
 #include "sdl2-ttf-light.h"
+#include "utilities.h"
+
+double camera_scale(world_t *world) {
+    return SCREEN_WIDTH / world->level_width;
+}
 
 rect_t camera_transform(world_t *world, rect_t rect) {
-    return (rect_t){rect.x, rect.y + world->camera_offset, rect.w, rect.h};
+    double scale = camera_scale(world);
+    return (rect_t){rect.x * scale + SCREEN_WIDTH / 2, (rect.y + world->camera_offset) * scale + SCREEN_HEIGHT / 2, rect.w * scale, rect.h * scale};
 }
 
 void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
@@ -24,34 +30,43 @@ void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
 /**
  * \brief La fonction applique la texture du fond sur le renderer lié à l'écran de jeu
  * \param renderer le renderer
+ * \param world les données du monde
+ * \param scroll_offset le décalage de la caméra
  * \param texture la texture liée au fond
  */
-void draw_background(SDL_Renderer *renderer, SDL_Texture *texture, int scroll_offset) {
+void draw_background(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture, double scroll_offset) {
+    double scale = camera_scale(world);
     int w, h;
     SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-    /* Deux copies pour un défilement continu */
-    SDL_Rect dest1 = {0, scroll_offset, w, h};
-    SDL_Rect dest2 = {0, scroll_offset - h, w, h};
-    SDL_RenderCopy(renderer, texture, NULL, &dest1);
-    SDL_RenderCopy(renderer, texture, NULL, &dest2);
+    double rect_height = SCREEN_WIDTH * h / w;
+    double initial_rect_y = scroll_offset * scale + SCREEN_HEIGHT / 2 - rect_height / 2;
+    double start_rect_y = positive_fmod(initial_rect_y, rect_height) - rect_height;
+    int n = MIN(ceil(SCREEN_HEIGHT / rect_height) + 2, SCREEN_HEIGHT * 2); // Limiter le nombre d'itérations pour s'assurer de ne pas créer une boucle infinie
+    // On dessine plusieurs copies de la texture pour créer un effet de défilement continu et remplir tout l'écran
+    for (int i = 0; i < n; i++) {
+        SDL_FRect rect = {0.0, start_rect_y + rect_height * i, SCREEN_WIDTH, rect_height};
+        SDL_RenderCopyF(renderer, texture, NULL, &rect);
+    }
 }
 
 /**
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
+ * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
  * \param renderer le renderer lié à l'écran de jeu
  * \param world les données du monde
  * \param resources les ressources
  */
-void draw_graphics(SDL_Renderer *renderer, resources_t *resources, world_t *world) {
+void draw_graphics(const char *exe_dir, SDL_Renderer *renderer, resources_t *resources, world_t *world) {
     clear_renderer(renderer);
 
+    refresh_font(exe_dir, resources, SCREEN_WIDTH * FONT_SIZE);
+
     if (world->game_state == GAME_STATE_SPLASH_SCREEN) {
-        SDL_Rect dest = {0, 0, SCREEN_WIDTH, SCREEN_HEIGHT}; // plein écran
-        SDL_RenderCopy(renderer, resources->splash_screen_texture, NULL, &dest);
+        draw_background(renderer, world, resources->splash_screen_texture, 0.0);
     }
 
     if (world->game_state == GAME_STATE_LEVEL_COMPLETE_SCREEN) {
-        draw_background(renderer, resources->background_texture, 0);
+        draw_background(renderer, world, resources->background_texture, 0);
 
         char message[32];
         sprintf(message, "Level %d complete!", world->current_level + 1);
@@ -59,7 +74,7 @@ void draw_graphics(SDL_Renderer *renderer, resources_t *resources, world_t *worl
     }
 
     if (world->game_state == GAME_STATE_END_SCREEN) {
-        draw_background(renderer, resources->background_texture, 0);
+        draw_background(renderer, world, resources->background_texture, 0);
 
         if (world->has_won) {
             draw_text(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, true, resources->font, "You won!");
@@ -69,10 +84,7 @@ void draw_graphics(SDL_Renderer *renderer, resources_t *resources, world_t *worl
     }
 
     if (world->game_state == GAME_STATE_PLAYING) {
-        int bg_w, bg_h;
-        SDL_QueryTexture(resources->background_texture, NULL, NULL, &bg_w, &bg_h);
-        int scroll_offset = (int)(world->camera_offset * BACKGROUND_SPEED) % bg_h;
-        draw_background(renderer, resources->background_texture, scroll_offset);
+        draw_background(renderer, world, resources->background_texture, world->camera_offset * BACKGROUND_SPEED);
 
         SDL_SetTextureAlphaMod(resources->spaceship_texture, world->invincible ? 128 : 255);
         draw_texture(renderer, resources->spaceship_texture, camera_transform(world, world->spaceship_rect));
