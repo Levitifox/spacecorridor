@@ -1,0 +1,28 @@
+// Icon resource
+#define IDI_APPICON 101
+IDI_APPICON ICON "app.ico"
+
+// Version info resource
+1 VERSIONINFO
+ FILEVERSION 1,0,0,0
+ PRODUCTVERSION 1,0,0,0
+ FILEFLAGSMASK 0x3fL
+ FILEFLAGS 0x0L
+ FILEOS 0x40004L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    // The language/charset block: 0x0409 = US English, 0x04B0 = Unicode
+    BLOCK "040904B0"
+    BEGIN
+      VALUE "FileDescription",  "Spacecorridor\0"
+      VALUE "ProductName",      "Spacecorridor\0"
+    END
+  END
+  BLOCK "VarFileInfo"
+  BEGIN
+    VALUE "Translation", 0x0409, 1200
+  END
+END
