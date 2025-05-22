@@ -23,6 +23,8 @@ typedef struct resources_s {
     SDL_Texture *background_texture;
     SDL_Surface *spaceship_surface;
     SDL_Texture *spaceship_texture;
+    SDL_Surface *flame_surface;
+    SDL_Texture *flame_texture;
     SDL_Surface *finish_line_surface;
     SDL_Texture *finish_line_texture;
     SDL_Surface *meteorite_surface;

@@ -42,7 +42,12 @@
 /**
  * \brief Taille d'un vaisseau
  */
-#define SHIP_SIZE 1.0
+#define SPACESHIP_SIZE 1.0
+
+/**
+ * \brief Taille d'une flamme relative au vaisseau
+ */
+#define FLAME_SCALE 0.27
 
 /**
  * \brief Taille d'un météorite
@@ -63,6 +68,11 @@
  * \brief Vitesse de déplacement avec les touches
  */
 #define MOVING_SPEED 0.00001
+
+/**
+ * \brief Vitesse de déplacement maximale que le vaisseau peut atteindre dans les conditions habituelles
+ */
+#define MAX_USUAL_SPEED 0.005
 
 /**
  * \brief Vitesse d'approche de la caméra vers le vaisseau

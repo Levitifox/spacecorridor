@@ -57,7 +57,7 @@ void transition_to_playing(const char *exe_dir, resources_t *resources, world_t 
     world->has_won = false;
     world->invincible = false;
 
-    world->spaceship_rect = (rect_t){0.0, 0.0, SHIP_SIZE, SHIP_SIZE};
+    world->spaceship_rect = (rect_t){0.0, 0.0, SPACESHIP_SIZE, SPACESHIP_SIZE};
     print_rect("spaceship", world->spaceship_rect);
     world->spaceship_speed_x = 0.0;
     world->spaceship_speed_y = 0.0;

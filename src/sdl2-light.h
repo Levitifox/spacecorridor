@@ -13,6 +13,8 @@ int init_sdl(SDL_Window **window, SDL_Renderer **renderer, int width, int height
 
 Uint32 get_pixel_RGBA32(SDL_Surface *surface, size_t x, size_t y);
 
+void clean_surface(SDL_Surface *surface);
+
 void clean_texture(SDL_Texture *texture);
 
 void clear_renderer(SDL_Renderer *renderer);

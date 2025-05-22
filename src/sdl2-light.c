@@ -93,19 +93,19 @@ Uint32 get_pixel_RGBA32(SDL_Surface *surface, size_t x, size_t y) {
 }
 
 /**
- * \brief La fonction nettoie une texture en mémoire
- * \param texture la texture à nettoyer
- */
-void clean_texture(SDL_Texture *texture) {
-    SDL_DestroyTexture(texture);
-}
-
-/**
  * \brief La fonction nettoie une surface en mémoire
  * \param surface la surface à nettoyer
  */
 void clean_surface(SDL_Surface *surface) {
     SDL_FreeSurface(surface);
+}
+
+/**
+ * \brief La fonction nettoie une texture en mémoire
+ * \param texture la texture à nettoyer
+ */
+void clean_texture(SDL_Texture *texture) {
+    SDL_DestroyTexture(texture);
 }
 
 /**

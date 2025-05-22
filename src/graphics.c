@@ -90,8 +90,15 @@ void draw_graphics(const char *exe_dir, SDL_Window *window, SDL_Renderer *render
     if (world->game_state == GAME_STATE_PLAYING) {
         draw_background(renderer, screen_w, screen_h, world, resources->background_texture, world->camera_offset * BACKGROUND_SPEED);
 
-        SDL_SetTextureAlphaMod(resources->spaceship_texture, world->invincible ? 128 : 255);
+        SDL_SetTextureAlphaMod(resources->spaceship_texture, (world->invincible ? 0.5 : 1.0) * 255);
         draw_texture(renderer, resources->spaceship_texture, camera_transform(screen_w, screen_h, world, world->spaceship_rect));
+
+        double flame_intensity = CLAMP(-world->spaceship_speed_y / MAX_USUAL_SPEED, 0.0, 1.0);
+        double flame_rect_w = world->spaceship_rect.w * FLAME_SCALE * flame_intensity;
+        double flame_rect_h = flame_rect_w * resources->flame_surface->h / resources->flame_surface->w;
+        rect_t flame_rect = {world->spaceship_rect.x, world->spaceship_rect.y + world->spaceship_rect.h / 2 + flame_rect_h / 2, flame_rect_w, flame_rect_h};
+        SDL_SetTextureAlphaMod(resources->flame_texture, flame_intensity * (world->invincible ? 0.5 : 1.0) * 255);
+        draw_texture(renderer, resources->flame_texture, camera_transform(screen_w, screen_h, world, flame_rect));
 
         draw_texture(renderer, resources->finish_line_texture, camera_transform(screen_w, screen_h, world, world->finish_line_rect));
 

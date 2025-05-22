@@ -74,6 +74,7 @@ void init_resources(const char *exe_dir, SDL_Renderer *renderer, resources_t *re
     resources->splash_screen_texture = load_image(renderer, exe_dir, "resources/splash_screen.png", &resources->splash_screen_surface, NULL);
     resources->background_texture = load_image(renderer, exe_dir, "resources/background.png", &resources->background_surface, NULL);
     resources->spaceship_texture = load_image(renderer, exe_dir, "resources/spaceship.png", &resources->spaceship_surface, NULL);
+    resources->flame_texture = load_image(renderer, exe_dir, "resources/flame.png", &resources->flame_surface, NULL);
     resources->finish_line_texture = load_image(renderer, exe_dir, "resources/finish_line.png", &resources->finish_line_surface, NULL);
     resources->meteorite_texture = load_image(renderer, exe_dir, "resources/meteorite.png", &resources->meteorite_surface, NULL);
     resources->splash_screen_sound = load_sound(exe_dir, "resources/splash_screen.wav");
@@ -100,10 +101,17 @@ void refresh_font(const char *exe_dir, resources_t *resources, int font_size) {
  * \param resources Les ressources
  */
 void clean_resources(resources_t *resources) {
+    clean_surface(resources->splash_screen_surface);
     clean_texture(resources->splash_screen_texture);
+    clean_surface(resources->background_surface);
     clean_texture(resources->background_texture);
+    clean_surface(resources->spaceship_surface);
     clean_texture(resources->spaceship_texture);
+    clean_surface(resources->flame_surface);
+    clean_texture(resources->flame_texture);
+    clean_surface(resources->finish_line_surface);
     clean_texture(resources->finish_line_texture);
+    clean_surface(resources->meteorite_surface);
     clean_texture(resources->meteorite_texture);
     clean_sound(resources->splash_screen_sound);
     clean_sound(resources->loss_sound);
