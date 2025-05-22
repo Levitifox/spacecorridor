@@ -64,8 +64,10 @@ void clean_data(world_t *world);
 
 void update_data(const char *exe_dir, resources_t *resources, world_t *world);
 
-void handle_events(const char *exe_dir, world_t *world);
+void handle_events(const char *exe_dir, resources_t *resources, world_t *world);
 
 bool rects_collide(rect_t rect_1, rect_t rect_2);
+
+bool objects_collide(SDL_Surface *surface_1, rect_t rect_1, SDL_Surface *surface_2, rect_t rect_2);
 
 #endif

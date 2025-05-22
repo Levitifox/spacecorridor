@@ -13,6 +13,6 @@
 
 void init_levels(const char *exe_dir, world_t *world);
 
-void init_level(const char *exe_dir, world_t *world);
+void init_level(const char *exe_dir, resources_t *resources, world_t *world);
 
 #endif

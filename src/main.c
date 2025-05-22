@@ -64,7 +64,7 @@ int main(int argc, char **argv) {
 
     while (true) {
         // gestion des évènements
-        handle_events(exe_dir, &world);
+        handle_events(exe_dir, &resources, &world);
 
         // mise à jour des données liée à la physique du monde
         update_data(exe_dir, &resources, &world);

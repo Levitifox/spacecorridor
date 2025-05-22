@@ -29,9 +29,10 @@ void init_levels(const char *exe_dir, world_t *world) {
 /**
  * \brief Initialise les éléments du niveau selon le niveau courant
  * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
+ * \param resources les ressources
  * \param world les données du monde
  */
-void init_level(const char *exe_dir, world_t *world) {
+void init_level(const char *exe_dir, resources_t *resources, world_t *world) {
     char level_path[30];
     sprintf(level_path, "resources/level_%d.png", world->current_level);
     SDL_Surface *level_surface;
@@ -40,7 +41,8 @@ void init_level(const char *exe_dir, world_t *world) {
     world->level_width = level_surface->w;
     world->level_height = level_surface->h;
 
-    world->finish_line_rect = (rect_t){0, -METEORITE_SIZE * level_surface->h, world->level_width, FINISH_LINE_HEIGHT};
+    world->finish_line_rect = (rect_t){0, -METEORITE_SIZE * level_surface->h, world->level_width,
+                                       world->level_width * resources->finish_line_surface->h / resources->finish_line_surface->w};
     print_rect("ligne", world->finish_line_rect);
 
     world->meteorites_count = 0;
