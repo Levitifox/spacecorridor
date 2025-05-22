@@ -50,14 +50,24 @@
 #define METEORITE_SIZE 1.0
 
 /**
+ * \brief Coefficient de la traînée
+ */
+#define DRAG_COEFFICIENT 0.003
+
+/**
  * \brief Vitesse initiale de déplacement vertical des éléments du jeu
  */
-#define CRUSING_SPEED 0.0025
+#define CRUSING_SPEED 0.000005
 
 /**
  * \brief Vitesse de déplacement avec les touches
  */
-#define MOVING_SPEED 0.003
+#define MOVING_SPEED 0.00001
+
+/**
+ * \brief Vitesse d'approche de la caméra vers le vaisseau
+ */
+#define CAMERA_APPROACH_RATE 0.001
 
 /**
  * \brief Vitesse de défilement de l'arrière-plan

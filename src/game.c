@@ -59,6 +59,8 @@ void transition_to_playing(const char *exe_dir, resources_t *resources, world_t 
 
     world->spaceship_rect = (rect_t){0.0, 0.0, SHIP_SIZE, SHIP_SIZE};
     print_rect("spaceship", world->spaceship_rect);
+    world->spaceship_speed_x = 0.0;
+    world->spaceship_speed_y = 0.0;
 
     init_level(exe_dir, resources, world);
 
@@ -113,27 +115,43 @@ void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
     } else if (world->game_state == GAME_STATE_PLAYING) {
         world->playing_time += world->time_since_last_frame;
 
-        // Mise à jour de la position de la camera et du vaisseau (de même valeur)
-        world->camera_offset += CRUSING_SPEED * world->time_since_last_frame;
-        world->spaceship_rect.y -= CRUSING_SPEED * world->time_since_last_frame;
+        // Mise à jour de l'accélération, la vitesse et la position du vaisseau
 
-        // Gestion des mouvements
+        double space_acceleration_x = 0.0;
+        double space_acceleration_y = 0.0;
+
+        space_acceleration_y -= CRUSING_SPEED;
+
+        // Gestion des mouvements avec les touches du clavier
         const Uint8 *keystate = SDL_GetKeyboardState(NULL);
         if (keystate[SDL_SCANCODE_LEFT] || keystate[SDL_SCANCODE_A] || keystate[SDL_SCANCODE_Q]) {
-            world->spaceship_rect.x -= MOVING_SPEED * world->time_since_last_frame;
+            space_acceleration_x -= MOVING_SPEED;
         }
         if (keystate[SDL_SCANCODE_RIGHT] || keystate[SDL_SCANCODE_D]) {
-            world->spaceship_rect.x += MOVING_SPEED * world->time_since_last_frame;
+            space_acceleration_x += MOVING_SPEED;
         }
         if (keystate[SDL_SCANCODE_UP] || keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_Z]) {
-            world->spaceship_rect.y -= MOVING_SPEED * world->time_since_last_frame;
+            space_acceleration_y -= MOVING_SPEED;
         }
         if (keystate[SDL_SCANCODE_DOWN] || keystate[SDL_SCANCODE_S]) {
-            world->spaceship_rect.y += MOVING_SPEED * world->time_since_last_frame;
+            space_acceleration_y += MOVING_SPEED;
         }
+
+        space_acceleration_x -= world->spaceship_speed_x * DRAG_COEFFICIENT;
+        space_acceleration_y -= world->spaceship_speed_y * DRAG_COEFFICIENT;
+
+        world->spaceship_speed_x += space_acceleration_x * world->time_since_last_frame;
+        world->spaceship_speed_y += space_acceleration_y * world->time_since_last_frame;
+
+        world->spaceship_rect.x += world->spaceship_speed_x * world->time_since_last_frame;
+        world->spaceship_rect.y += world->spaceship_speed_y * world->time_since_last_frame;
 
         world->spaceship_rect.x =
             CLAMP(world->spaceship_rect.x, -world->level_width / 2 + world->spaceship_rect.w / 2, world->level_width / 2 - world->spaceship_rect.w / 2);
+
+        // Mise à jour de la position de la caméra (décroissance exponentielle vets la position du vaisseau)
+        world->camera_offset +=
+            (-world->spaceship_rect.y + INITIAL_CAMERA_OFFSET - world->camera_offset) * (1.0 - exp(-CAMERA_APPROACH_RATE * world->time_since_last_frame));
 
         do {
             // Collision avec la ligne d'arrivée
