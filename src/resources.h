@@ -17,10 +17,15 @@
  * \brief Représentation pour stocker les textures nécessaires à l'affichage graphique
  */
 typedef struct resources_s {
+    SDL_Surface *splash_screen_surface;
     SDL_Texture *splash_screen_texture;
-    SDL_Texture *background_texture; /*!< Texture liée à l'image du fond de l'écran. */
+    SDL_Surface *background_surface;
+    SDL_Texture *background_texture;
+    SDL_Surface *spaceship_surface;
     SDL_Texture *spaceship_texture;
+    SDL_Surface *finish_line_surface;
     SDL_Texture *finish_line_texture;
+    SDL_Surface *meteorite_surface;
     SDL_Texture *meteorite_texture;
     Mix_Chunk *splash_screen_sound;
     Mix_Chunk *loss_sound;

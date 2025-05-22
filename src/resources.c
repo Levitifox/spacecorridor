@@ -71,11 +71,11 @@ void clean_sound(Mix_Chunk *sound) {
  * \param resources Les ressources du jeu
  */
 void init_resources(const char *exe_dir, SDL_Renderer *renderer, resources_t *resources) {
-    resources->splash_screen_texture = load_image(renderer, exe_dir, "resources/splash_screen.png", NULL, NULL);
-    resources->background_texture = load_image(renderer, exe_dir, "resources/background.png", NULL, NULL);
-    resources->spaceship_texture = load_image(renderer, exe_dir, "resources/spaceship.png", NULL, NULL);
-    resources->finish_line_texture = load_image(renderer, exe_dir, "resources/finish_line.png", NULL, NULL);
-    resources->meteorite_texture = load_image(renderer, exe_dir, "resources/meteorite.png", NULL, NULL);
+    resources->splash_screen_texture = load_image(renderer, exe_dir, "resources/splash_screen.png", &resources->splash_screen_surface, NULL);
+    resources->background_texture = load_image(renderer, exe_dir, "resources/background.png", &resources->background_surface, NULL);
+    resources->spaceship_texture = load_image(renderer, exe_dir, "resources/spaceship.png", &resources->spaceship_surface, NULL);
+    resources->finish_line_texture = load_image(renderer, exe_dir, "resources/finish_line.png", &resources->finish_line_surface, NULL);
+    resources->meteorite_texture = load_image(renderer, exe_dir, "resources/meteorite.png", &resources->meteorite_surface, NULL);
     resources->splash_screen_sound = load_sound(exe_dir, "resources/splash_screen.wav");
     resources->loss_sound = load_sound(exe_dir, "resources/loss.wav");
     resources->win_sound = load_sound(exe_dir, "resources/win.wav");

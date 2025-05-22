@@ -50,11 +50,6 @@
 #define METEORITE_SIZE 1.0
 
 /**
- * \brief Hauteur de la ligne d'arrivée
- */
-#define FINISH_LINE_HEIGHT 0.75
-
-/**
  * \brief Vitesse initiale de déplacement vertical des éléments du jeu
  */
 #define CRUSING_SPEED 0.0025

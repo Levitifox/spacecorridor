@@ -51,16 +51,16 @@ void transition_to_splash_screen(resources_t *resources, world_t *world) {
     world->splash_screen_sound_channel = play_sound(resources->splash_screen_sound);
 }
 
-void transition_to_playing(const char *exe_dir, world_t *world) {
+void transition_to_playing(const char *exe_dir, resources_t *resources, world_t *world) {
     world->game_state = GAME_STATE_PLAYING;
     world->camera_offset = INITIAL_CAMERA_OFFSET;
     world->has_won = false;
     world->invincible = false;
 
-    world->spaceship_rect = (rect_t){0, 0, SHIP_SIZE, SHIP_SIZE};
+    world->spaceship_rect = (rect_t){0.0, 0.0, SHIP_SIZE, SHIP_SIZE};
     print_rect("spaceship", world->spaceship_rect);
 
-    init_level(exe_dir, world);
+    init_level(exe_dir, resources, world);
 
     stop_sound(world->splash_screen_sound_channel);
 }
@@ -108,7 +108,7 @@ void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
     } else if (world->game_state == GAME_STATE_SPLASH_SCREEN) {
         world->screen_time += world->time_since_last_frame;
         if (world->screen_time >= 3000) {
-            transition_to_playing(exe_dir, world);
+            transition_to_playing(exe_dir, resources, world);
         }
     } else if (world->game_state == GAME_STATE_PLAYING) {
         world->playing_time += world->time_since_last_frame;
@@ -137,7 +137,7 @@ void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
 
         do {
             // Collision avec la ligne d'arrivée
-            if (rects_collide(world->spaceship_rect, world->finish_line_rect)) {
+            if (objects_collide(resources->spaceship_surface, world->spaceship_rect, resources->finish_line_surface, world->finish_line_rect)) {
                 if (world->current_level == world->level_count - 1) {
                     transition_to_end_screen_win(resources, world);
                     break;
@@ -150,7 +150,7 @@ void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
             if (!world->invincible) {
                 // Collision entre le vaisseau et les météorites
                 for (size_t i = 0; i < world->meteorites_count; i++) {
-                    if (rects_collide(world->spaceship_rect, world->meteorite_rects[i])) {
+                    if (objects_collide(resources->spaceship_surface, world->spaceship_rect, resources->meteorite_surface, world->meteorite_rects[i])) {
                         transition_to_end_screen_loss(resources, world);
                         break;
                     }
@@ -161,7 +161,7 @@ void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
         world->screen_time += world->time_since_last_frame;
         if (world->screen_time >= 3000) {
             world->current_level++;
-            transition_to_playing(exe_dir, world);
+            transition_to_playing(exe_dir, resources, world);
         }
     } else if (world->game_state == GAME_STATE_END_SCREEN) {
         world->screen_time += world->time_since_last_frame;
@@ -174,9 +174,10 @@ void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
 /**
  * \brief La fonction gère les évènements ayant eu lieu et qui n'ont pas encore été traités
  * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
+ * \param resources les ressources
  * \param world les données du monde
  */
-void handle_events(const char *exe_dir, world_t *world) {
+void handle_events(const char *exe_dir, resources_t *resources, world_t *world) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         // Si l'utilisateur a cliqué sur le X de la fenêtre
@@ -193,7 +194,7 @@ void handle_events(const char *exe_dir, world_t *world) {
                 world->invincible = !world->invincible;
             }
             if (event.key.keysym.sym == SDLK_SPACE && world->game_state == GAME_STATE_SPLASH_SCREEN) {
-                transition_to_playing(exe_dir, world);
+                transition_to_playing(exe_dir, resources, world);
             }
         }
     }
@@ -208,4 +209,56 @@ void handle_events(const char *exe_dir, world_t *world) {
 bool rects_collide(rect_t rect_1, rect_t rect_2) {
     return MAX(rect_1.x - rect_1.w / 2, rect_2.x - rect_2.w / 2) <= MIN(rect_1.x + rect_1.w / 2, rect_2.x + rect_2.w / 2) &&
            MAX(rect_1.y - rect_1.h / 2, rect_2.y - rect_2.h / 2) <= MIN(rect_1.y + rect_1.h / 2, rect_2.y + rect_2.h / 2);
+}
+
+/**
+ * \brief Indique si deux objets sont en collision
+ * \param surface_1 La première surface
+ * \param rect_1 Le premier rect
+ * \param surface_2 La deuxième surface
+ * \param rect_2 Le deuxième rect
+ * \return true s'il y a collision, false sinon
+ */
+bool objects_collide(SDL_Surface *surface_1, rect_t rect_1, SDL_Surface *surface_2, rect_t rect_2) {
+    if (!rects_collide(rect_1, rect_2)) {
+        return false;
+    }
+    // On itere chaque pixel de la surface 1, on calcule la position de ce pixel dans la systeme de coordonnée global, puis on le transforme dans la surface 2.
+    // On dit qu'il y a collision si la somme des alpha des deux pixels est supérieur à 0xFF.
+    for (int sx_1 = 0; sx_1 < surface_1->w; sx_1++) {
+        for (int sy_1 = 0; sy_1 < surface_1->h; sy_1++) {
+            double x = rect_1.x + rect_1.w * ((double)sx_1 / surface_1->w - 0.5);
+            double y = rect_1.y + rect_1.h * ((double)sy_1 / surface_1->h - 0.5);
+            int sx_2 = round(((x - rect_2.x) / rect_2.w + 0.5) * surface_2->w);
+            int sy_2 = round(((y - rect_2.y) / rect_2.h + 0.5) * surface_2->h);
+            if (sx_2 >= 0 && sx_2 < surface_2->w && sy_2 >= 0 && sy_2 < surface_2->h) {
+                Uint32 pixel_1 = get_pixel_RGBA32(surface_1, sx_1, sy_1);
+                Uint32 pixel_2 = get_pixel_RGBA32(surface_2, sx_2, sy_2);
+                Uint8 alpha_1 = (pixel_1 >> 24) & 0xFF;
+                Uint8 alpha_2 = (pixel_2 >> 24) & 0xFF;
+                if (alpha_1 + alpha_2 > 0xFF) {
+                    return true;
+                }
+            }
+        }
+    }
+    // Et vice versa.
+    for (int sx_2 = 0; sx_2 < surface_2->w; sx_2++) {
+        for (int sy_2 = 0; sy_2 < surface_2->h; sy_2++) {
+            double x = rect_2.x + rect_2.w * ((double)sx_2 / surface_2->w - 0.5);
+            double y = rect_2.y + rect_2.h * ((double)sy_2 / surface_2->h - 0.5);
+            int sx_1 = round(((x - rect_1.x) / rect_1.w + 0.5) * surface_1->w);
+            int sy_1 = round(((y - rect_1.y) / rect_1.h + 0.5) * surface_1->h);
+            if (sx_1 >= 0 && sx_1 < surface_1->w && sy_1 >= 0 && sy_1 < surface_1->h) {
+                Uint32 pixel_2 = get_pixel_RGBA32(surface_2, sx_2, sy_2);
+                Uint32 pixel_1 = get_pixel_RGBA32(surface_1, sx_1, sy_1);
+                Uint8 alpha_2 = (pixel_2 >> 24) & 0xFF;
+                Uint8 alpha_1 = (pixel_1 >> 24) & 0xFF;
+                if (alpha_2 + alpha_1 > 0xFF) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false;
 }
