@@ -15,14 +15,19 @@
 #define MAX_FPS 240
 
 /**
- * \brief Largeur de l'écran de jeu
+ * \brief Largeur initial de l'écran de jeu
  */
-#define SCREEN_WIDTH 400
+#define INITIAL_SCREEN_WIDTH 400
 
 /**
- * \brief Hauteur de l'écran de jeu
+ * \brief Hauteur initial de l'écran de jeu
  */
-#define SCREEN_HEIGHT 640
+#define INITIAL_SCREEN_HEIGHT 640
+
+/**
+ * \brief Ratio maximal de l'écran de jeu
+ */
+#define MAX_SCREEN_RATIO 0.8
 
 /**
  * \brief Taille de la police

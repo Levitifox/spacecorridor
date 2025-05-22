@@ -19,7 +19,7 @@
  * \param resources les ressources
  */
 void init(const char *exe_dir, SDL_Window **window, SDL_Renderer **renderer, resources_t *resources, world_t *world) {
-    init_sdl(window, renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
+    init_sdl(window, renderer, INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT);
     init_ttf();
     init_mix();
     SDL_SetWindowTitle(*window, "Spacecorridor"); // Définir le titre de la fenêtre
@@ -73,7 +73,7 @@ int main(int argc, char **argv) {
         }
 
         // rafraichissement de l'écran
-        draw_graphics(exe_dir, renderer, &resources, &world);
+        draw_graphics(exe_dir, window, renderer, &resources, &world);
 
         wait_for_next_frame(&world);
     }

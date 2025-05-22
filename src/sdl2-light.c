@@ -17,13 +17,13 @@ int init_sdl(SDL_Window **window, SDL_Renderer **renderer, int width, int height
         fprintf(stderr, "Erreur initialisation de la SDL : %s\n", SDL_GetError());
         return -1;
     }
-    SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
+    // SDL_SetHint(SDL_HINT_RENDER_DRIVER, "software");
     int img_flags = IMG_INIT_JPG | IMG_INIT_PNG;
     if ((IMG_Init(img_flags) & img_flags) != img_flags) {
         fprintf(stderr, "Erreur initialisation de la IMG : %s\n", IMG_GetError());
         return -1;
     }
-    if (SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_SHOWN, window, renderer) != 0) {
+    if (SDL_CreateWindowAndRenderer(width, height, SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI, window, renderer) != 0) {
         fprintf(stderr, "Erreur lors de la creation de l'image et du renderer : %s\n", SDL_GetError());
         return -1;
     }

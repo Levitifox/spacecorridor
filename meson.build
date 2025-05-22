@@ -5,6 +5,9 @@ project(
     default_options: ['warning_level=3'],  # 'b_sanitize=address,undefined'
 )
 
+cc = meson.get_compiler('c')
+m = cc.find_library('m', required: false)
+
 sdl2 = dependency('sdl2', required: true)
 sdl2_image = dependency('sdl2_image', required: true)
 sdl2_ttf = dependency('sdl2_ttf', required: true)
@@ -22,7 +25,7 @@ executable(
         'src/sdl2-ttf-light.c',
         'src/utilities.c',
     ],
-    dependencies: [sdl2, sdl2_image, sdl2_ttf, sdl2_mixer],
+    dependencies: [m, sdl2, sdl2_image, sdl2_ttf, sdl2_mixer],
     install: true,
 )
 

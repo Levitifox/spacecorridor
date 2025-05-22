@@ -17,9 +17,9 @@
 
 void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect);
 
-void draw_background(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture, double scroll_offset);
+void draw_background(SDL_Renderer *renderer, double screen_w, double screen_h, world_t *world, SDL_Texture *texture, double scroll_offset);
 
-void draw_graphics(const char *exe_dir, SDL_Renderer *renderer, resources_t *resources, world_t *world);
+void draw_graphics(const char *exe_dir, SDL_Window *window, SDL_Renderer *renderer, resources_t *resources, world_t *world);
 
 void wait_for_next_frame(world_t *world);
 

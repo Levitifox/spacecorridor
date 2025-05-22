@@ -13,13 +13,13 @@
 #include "sdl2-ttf-light.h"
 #include "utilities.h"
 
-double camera_scale(world_t *world) {
-    return SCREEN_WIDTH / world->level_width;
+double camera_scale(double screen_w, double screen_h, world_t *world) {
+    return MIN(screen_w, screen_h * MAX_SCREEN_RATIO) / world->level_width;
 }
 
-rect_t camera_transform(world_t *world, rect_t rect) {
-    double scale = camera_scale(world);
-    return (rect_t){rect.x * scale + SCREEN_WIDTH / 2, (rect.y + world->camera_offset) * scale + SCREEN_HEIGHT / 2, rect.w * scale, rect.h * scale};
+rect_t camera_transform(double screen_w, double screen_h, world_t *world, rect_t rect) {
+    double scale = camera_scale(screen_w, screen_h, world);
+    return (rect_t){rect.x * scale + screen_w / 2, (rect.y + world->camera_offset) * scale + screen_h / 2, rect.w * scale, rect.h * scale};
 }
 
 void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
@@ -34,17 +34,17 @@ void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
  * \param scroll_offset le décalage de la caméra
  * \param texture la texture liée au fond
  */
-void draw_background(SDL_Renderer *renderer, world_t *world, SDL_Texture *texture, double scroll_offset) {
-    double scale = camera_scale(world);
+void draw_background(SDL_Renderer *renderer, double screen_w, double screen_h, world_t *world, SDL_Texture *texture, double scroll_offset) {
+    double scale = camera_scale(screen_w, screen_h, world);
     int w, h;
     SDL_QueryTexture(texture, NULL, NULL, &w, &h);
-    double rect_height = SCREEN_WIDTH * h / w;
-    double initial_rect_y = scroll_offset * scale + SCREEN_HEIGHT / 2 - rect_height / 2;
+    double rect_height = screen_w * h / w;
+    double initial_rect_y = scroll_offset * scale + screen_h / 2 - rect_height / 2;
     double start_rect_y = positive_fmod(initial_rect_y, rect_height) - rect_height;
-    int n = MIN(ceil(SCREEN_HEIGHT / rect_height) + 2, SCREEN_HEIGHT * 2); // Limiter le nombre d'itérations pour s'assurer de ne pas créer une boucle infinie
+    int n = MIN(ceil(screen_h / rect_height) + 2, screen_h * 2); // Limiter le nombre d'itérations pour s'assurer de ne pas créer une boucle infinie
     // On dessine plusieurs copies de la texture pour créer un effet de défilement continu et remplir tout l'écran
     for (int i = 0; i < n; i++) {
-        SDL_FRect rect = {0.0, start_rect_y + rect_height * i, SCREEN_WIDTH, rect_height};
+        SDL_FRect rect = {0.0, start_rect_y + rect_height * i, screen_w, rect_height};
         SDL_RenderCopyF(renderer, texture, NULL, &rect);
     }
 }
@@ -56,43 +56,47 @@ void draw_background(SDL_Renderer *renderer, world_t *world, SDL_Texture *textur
  * \param world les données du monde
  * \param resources les ressources
  */
-void draw_graphics(const char *exe_dir, SDL_Renderer *renderer, resources_t *resources, world_t *world) {
+void draw_graphics(const char *exe_dir, SDL_Window *window, SDL_Renderer *renderer, resources_t *resources, world_t *world) {
     clear_renderer(renderer);
 
-    refresh_font(exe_dir, resources, SCREEN_WIDTH * FONT_SIZE);
+    int screen_w_int, screen_h_int;
+    SDL_GetWindowSize(window, &screen_w_int, &screen_h_int);
+    double screen_w = screen_w_int, screen_h = screen_h_int;
+
+    refresh_font(exe_dir, resources, screen_w * FONT_SIZE);
 
     if (world->game_state == GAME_STATE_SPLASH_SCREEN) {
-        draw_background(renderer, world, resources->splash_screen_texture, 0.0);
+        draw_background(renderer, screen_w, screen_h, world, resources->splash_screen_texture, 0.0);
     }
 
     if (world->game_state == GAME_STATE_LEVEL_COMPLETE_SCREEN) {
-        draw_background(renderer, world, resources->background_texture, 0);
+        draw_background(renderer, screen_w, screen_h, world, resources->background_texture, 0);
 
         char message[32];
         sprintf(message, "Level %d complete!", world->current_level + 1);
-        draw_text(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, true, resources->font, message);
+        draw_text(renderer, screen_w / 2, screen_h / 2, true, resources->font, message);
     }
 
     if (world->game_state == GAME_STATE_END_SCREEN) {
-        draw_background(renderer, world, resources->background_texture, 0);
+        draw_background(renderer, screen_w, screen_h, world, resources->background_texture, 0);
 
         if (world->has_won) {
-            draw_text(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, true, resources->font, "You won!");
+            draw_text(renderer, screen_w / 2, screen_h / 2, true, resources->font, "You won!");
         } else {
-            draw_text(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, true, resources->font, "You lost!");
+            draw_text(renderer, screen_w / 2, screen_h / 2, true, resources->font, "You lost!");
         }
     }
 
     if (world->game_state == GAME_STATE_PLAYING) {
-        draw_background(renderer, world, resources->background_texture, world->camera_offset * BACKGROUND_SPEED);
+        draw_background(renderer, screen_w, screen_h, world, resources->background_texture, world->camera_offset * BACKGROUND_SPEED);
 
         SDL_SetTextureAlphaMod(resources->spaceship_texture, world->invincible ? 128 : 255);
-        draw_texture(renderer, resources->spaceship_texture, camera_transform(world, world->spaceship_rect));
+        draw_texture(renderer, resources->spaceship_texture, camera_transform(screen_w, screen_h, world, world->spaceship_rect));
 
-        draw_texture(renderer, resources->finish_line_texture, camera_transform(world, world->finish_line_rect));
+        draw_texture(renderer, resources->finish_line_texture, camera_transform(screen_w, screen_h, world, world->finish_line_rect));
 
         for (size_t i = 0; i < world->meteorites_count; i++) {
-            draw_texture(renderer, resources->meteorite_texture, camera_transform(world, world->meteorite_rects[i]));
+            draw_texture(renderer, resources->meteorite_texture, camera_transform(screen_w, screen_h, world, world->meteorite_rects[i]));
         }
 
         /* Mise à jour du temps écoulé et affichage */
