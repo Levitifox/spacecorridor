@@ -52,12 +52,12 @@
 /**
  * \brief Vitesse initiale de déplacement vertical des éléments du jeu
  */
-#define CRUSING_SPEED 0.0025
+#define CRUSING_SPEED 0.000025
 
 /**
  * \brief Vitesse de déplacement avec les touches
  */
-#define MOVING_SPEED 0.003
+#define MOVING_SPEED (0.000025 * 3.0)
 
 /**
  * \brief Vitesse de défilement de l'arrière-plan

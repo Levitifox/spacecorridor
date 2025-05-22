@@ -48,6 +48,8 @@ typedef struct world_s {
     double level_width;   /*!< Largeur du niveau */
     double level_height;  /*!< Hauteur du niveau */
     double camera_offset; /*!< Décalage de la caméra */
+    double spaceship_speed_x;
+    double spaceship_speed_y;
     rect_t spaceship_rect;
     rect_t finish_line_rect; /*!< La ligne d'arrivée */
     size_t meteorites_count;
