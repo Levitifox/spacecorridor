@@ -30,6 +30,8 @@ void draw_texture(SDL_Renderer *renderer, SDL_Texture *texture, rect_t rect) {
 /**
  * \brief La fonction applique la texture du fond sur le renderer lié à l'écran de jeu
  * \param renderer le renderer
+ * \param screen_w la largeur de l'écran
+ * \param screen_h la hauteur de l'écran
  * \param world les données du monde
  * \param scroll_offset le décalage de la caméra
  * \param texture la texture liée au fond
@@ -52,6 +54,7 @@ void draw_background(SDL_Renderer *renderer, double screen_w, double screen_h, w
 /**
  * \brief La fonction rafraichit l'écran en fonction de l'état des données du monde
  * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
+ * \param window la fenêtre de jeu
  * \param renderer le renderer lié à l'écran de jeu
  * \param world les données du monde
  * \param resources les ressources

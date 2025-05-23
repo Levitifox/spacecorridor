@@ -4,18 +4,6 @@
     box-sizing: border-box;
 }
 
-html {
-    scroll-behavior: smooth;
-}
-
-@media (min-width: 1500px) {
-    body {
-        max-width: 1500px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-}
-
 body {
     font-family: "Segoe UI", sans-serif;
     line-height: 1.7;
@@ -66,7 +54,6 @@ li + li {
 code {
     font-family: monospace;
     background-color: #f6f6f6;
-    padding: 0.2rem;
     border-radius: 3px;
 }
 
@@ -110,19 +97,13 @@ pre {
     flex: 1;
 }
 
-.description-block .img {
-    margin: 0px 1.5rem;
-    max-width: 40%;
+.description-block .screenshot {
+    margin: 20px;
+    max-width: 45%;
     height: auto;
     border-radius: 8px;
     align-self: center;
     box-shadow: 3px 3px 15px rgba(0 0 0 / 0.5);
-}
-
-.svg {
-    width: 100%;
-    height: auto;
-    display: block;
 }
 
 aside {
@@ -132,62 +113,9 @@ aside {
     border-radius: 3px;
 }
 
-.sidebar {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 16rem;
-    height: 100vh;
-    overflow-y: auto;
-    border-right: 1px solid #e6e5e5;
-    padding: 2rem 1rem;
-    z-index: 100;
-
-    li {
-        border-left: 1px solid #e6e5e5;
-        padding: 0.4rem 1rem;
-        margin: 0;
-
-        a {
-            color: #404040;
-        }
-        a:hover {
-            color: #0066cc;
-            text-decoration: none;
-        }
-    }
-
-    li:hover {
-        border-left: 1px solid #ababab;
-    }
-
-    ul {
-        margin: 0;
-    }
-}
-
-.sidebar nav ul {
-    list-style: none;
-}
-
 .main-content {
-    margin-left: 16rem;
-    padding: 2em;
-}
-
-@media (max-width: 600px) {
-    .sidebar {
-        position: relative;
-        width: 100%;
-        height: auto;
-        border-right: none;
-        box-shadow: none;
-    }
-
-    .main-content {
-        margin-left: 0;
-        margin-top: 1.5rem;
-    }
+    max-width: 1000px;
+    margin: 0 auto;
 }
 
 .first-element {
@@ -196,6 +124,7 @@ aside {
 
 .languages {
     float: right;
-    width: 310px;
+    width: 100%;
+    max-width: 310px;
     margin: 1rem;
 }

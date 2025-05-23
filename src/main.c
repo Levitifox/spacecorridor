@@ -17,6 +17,7 @@
  * \param window la fenêtre du jeu
  * \param renderer le renderer
  * \param resources les ressources
+ * \param world le monde
  */
 void init(const char *exe_dir, SDL_Window **window, SDL_Renderer **renderer, resources_t *resources, world_t *world) {
     init_sdl(window, renderer, INITIAL_SCREEN_WIDTH, INITIAL_SCREEN_HEIGHT);

@@ -13,11 +13,14 @@ sdl2_image = dependency('sdl2_image', required: true)
 sdl2_ttf = dependency('sdl2_ttf', required: true)
 sdl2_mixer = dependency('SDL2_mixer', required: true)
 
-windows = import('windows')
-res = windows.compile_resources(
-    'resources/app.rc',
-    depend_files: ['resources/app.ico'],
-)
+res = []
+if target_machine.system() == 'windows'
+    windows = import('windows')
+    res = windows.compile_resources(
+        'resources/app.rc',
+        depend_files: ['resources/app.ico'],
+    )
+endif
 
 executable(
     'spacecorridor',

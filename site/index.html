@@ -6,22 +6,6 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-        <div class="sidebar">
-            <p class="list">Table des matières</p>
-            <nav>
-                <ul>
-                    <li><a href="#introduction">Introduction</a></li>
-                    <li><a href="#auteurs">Équipe & Contexte</a></li>
-                    <li><a href="#description">Fonctionnement du jeu</a></li>
-                    <li><a href="#structure">Structure du projet</a></li>
-                    <li><a href="#architecture">Architecture</a></li>
-                    <li><a href="#problemes">Problèmes & Solutions</a></li>
-                    <li><a href="#metrologie">Métrologie</a></li>
-                    <li><a href="#documentation">Documentation</a></li>
-                </ul>
-            </nav>
-        </div>
-
         <div class="main-content">
             <h2 id="introduction" class="first-element">Introduction</h2>
             <p>
@@ -30,9 +14,9 @@
             </p>
             <p>Les objectifs du projet sont :</p>
             <ul>
-                <li>Se familiariser avec le développement d'un jeu vidéo en C</li>
+                <li>Se familiariser avec le développement d’un jeu vidéo en C</li>
                 <li>Prendre en main la bibliothèque SDL2 pour la gestion des graphismes, du texte et des entrées utilisateur</li>
-                <li>Appliquer des bonnes pratiques de développement, notamment l'organisation du code, les tests et la documentation (Doxygen)</li>
+                <li>Appliquer des bonnes pratiques de développement, notamment l’organisation du code, les tests et la documentation (Doxygen)</li>
                 <li>Utiliser Git pour la gestion de versions, avec un historique clair et régulier</li>
                 <li>Travailler efficacement en binôme, en assurant une répartition équitable des tâches</li>
             </ul>
@@ -56,11 +40,13 @@
                         le haut dans un couloir préétabli.
                     </p>
                     <ul>
-                        <li><strong>Objectif</strong> : éviter des météorites et atteindre la ligne d'arrivée aussi rapidement que possible.</li>
+                        <li><strong>Objectif</strong> : éviter des météorites et atteindre la ligne d’arrivée aussi rapidement que possible.</li>
                         <li>
                             <strong>Commandes</strong> :
                             <ul>
+                                <li>Espace pour ignorer l’écran de démarrage</li>
                                 <li>WASD (QWERTY) / ZQSD (AZERTY) ou flèches ↑ ↓ ← → pour déplacer le vaisseau</li>
+                                <li>I pour activer/désactiver le mode d’invincibilité</li>
                                 <li>Échap pour quitter le jeu</li>
                             </ul>
                         </li>
@@ -69,12 +55,13 @@
                             <ul>
                                 <li>Temps écoulé depuis le début du niveau, affiché en haut à droite</li>
                                 <li>Fond avec effet de parallaxe pour un rendu visuel dynamique</li>
+                                <li>La fenêtre peut être redimensionnée et le jeu fonctionne correctement sur n’importe quelle résolution</li>
                             </ul>
                         </li>
                         <li>
                             <strong>Son</strong> :
                             <ul>
-                                <li>Musique lors de l'écran de démarrage (splash screen)</li>
+                                <li>Musique lors de l’écran de démarrage (splash screen)</li>
                                 <li>Effet sonore de collision à la mort</li>
                                 <li>Effet sonore de victoire à la fin</li>
                             </ul>
@@ -88,83 +75,123 @@
                         </li>
                     </ul>
                 </div>
-                <img src="screenshot.png" alt="screenshot" class="img" />
+                <img src="screenshot.png" alt="Screenshot" class="screenshot" />
             </div>
 
-            <h2 id="structure">Structure du dépôt et description des fichiers</h2>
+            <h2 id="installation">Installation des dépendances</h2>
+            <p>Pour faire fonctionner <strong>Spacecorridor</strong>, installez d’abord les dépendances suivantes :</p>
+            <h3>Sur Windows (MSYS2)</h3>
             <pre>
-spacecorridor/
-├─ resources/           # tous les assets (images, polices, sons)
-├─ site/                # site Web avec de la documentation
-├─ src/                 # code source C (logique de jeu, rendu, entrée, wrappers SDL2)
-├─ .clang-format        # règles de style du code
-├─ .gitignore           # fichiers et dossiers exclus du suivi Git
-├─ .prettierrc.json     # règles de style du site
-├─ Doxyfile.in          # template de configuration Doxygen
-├─ infos.txt            # métadonnées du projet (auteurs, groupe)
-├─ Makefile             # cibles : build, run, dist, doxygen
-├─ meson.build          # configuration du build multiplateforme (Meson)
-└─ README.md            # guide d'installation et d'utilisation</pre
+pacman -S mingw-w64-x86_64-gcc mingw-w64-x86_64-clang mingw-w64-x86_64-meson mingw-w64-x86_64-gdb mingw-w64-x86_64-python-pygments
+pacman -S mingw-w64-x86_64-SDL2 mingw-w64-x86_64-SDL2_gfx mingw-w64-x86_64-SDL2_image mingw-w64-x86_64-SDL2_mixer mingw-w64-x86_64-SDL2_net mingw-w64-x86_64-SDL2_pango mingw-w64-x86_64-SDL2_sound mingw-w64-x86_64-SDL2_ttf</pre
+            >
+            <h3>Sur Ubuntu (ou similaire)</h3>
+            <pre>
+sudo apt install build-essential clang git pkg-config meson
+sudo apt install libsdl2-dev libsdl2-image-dev libsdl2-ttf-dev libsdl2-net-dev libsdl2-mixer-dev libsdl2-gfx-dev</pre
             >
 
+            <h2 id="compilation">Compilation</h2>
+            <p>Dans un terminal Linux (ou similaire) or l’environment MSYS2 WINGW64, exécutez :</p>
+            <pre>
+meson setup builddir
+meson compile</pre
+            >
+            <p>Ou simplement :</p>
+            <pre>make</pre>
+
+            <h2 id="execution">Exécution</h2>
+            <p>Lancez l’exécutable <code>./builddir/spacecorridor</code>, ou utilisez :</p>
+            <pre>make run</pre>
+
+            <h2 id="packaging">Packaging</h2>
+            <p>Pour créer une distribution Windows :</p>
+            <pre>make dist</pre>
+
+            <h2 id="documentation-generee">Génération de la documentation</h2>
+            <p>Pour générer la documentation Doxygen :</p>
+            <pre>make doxygen</pre>
+            <p>Les pages Web seront produites dans <a href="../builddir/doxygen/html/files.html">builddir/doxygen/html/files.html</a>.</p>
+
             <h2 id="architecture">Architecture logicielle et formules clés</h2>
-            <h3>Initialisation et splash (<code>src/main.c</code>)</h3>
-            <ul>
-                <li>
-                    <code>init(window, renderer, resources)</code> : configuration de SDL2, création de la fenêtre et du renderer, chargement des ressources.
-                </li>
-                <li>
-                    <code>show_splash_screen(renderer, "resources/splash_screen.png", 3000)</code> : affichage plein écran du splash + lecture du son associé,
-                    pause de 3 s.
-                </li>
-                <li><code>init_data(&world)</code> : état initial du monde (position du vaisseau, génération de la trajectoire et du timer).</li>
-            </ul>
 
-            <h3>Boucle de jeu principale (<code>src/main.c</code>)</h3>
-            <ol>
-                <li>
-                    <strong>update_data(&world)</strong> :
-                    <ul>
-                        <li>le vaisseau avance automatiquement vers le haut,</li>
-                        <li>les météorites défilent selon leur trajectoire prédéfinie,</li>
-                        <li>mise à jour du timer (temps écoulé depuis le début du niveau).</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>handle_events(&event, &world)</strong> :
-                    <ul>
-                        <li>lecture de <code>SDL_PollEvent</code>,</li>
-                        <li>changement d'état en réaction.</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>refresh_graphics(renderer, &world, &resources)</strong> :
-                    <ul>
-                        <li>rendu du fond avec effet de parallaxe (deux calques décalés),</li>
-                        <li>dessin du vaisseau, des météorites et de la ligne d'arrivée,</li>
-                        <li>affichage du temps écoulé en haut à droite.</li>
-                    </ul>
-                </li>
-                <li>
-                    <strong>Limitation du framerate</strong> :
-                    <p>
-                        On calcule T<sub>next</sub> = T<sub>last</sub> + 1000 / MAX_FPS, Δ = max(0, T<sub>next</sub> - T<sub>now</sub>) où T = SDL_GetTicks64()
-                        et on attends Δ ms après un frame pour maintenir la fréquence cible.
-                    </p>
-                </li>
-            </ol>
+            <p>Le jeu fonctionne en maintenant une machine à états :</p>
+            <img src="game_states.svg" alt="Game states" style="width: 100%; max-width: 700px" />
+            <p>La boucle de rendu n’est jamais bloquée, tout est asynchrone.</p>
 
-            <h3>Audio</h3>
-            <ul>
-                <li>SDL2_mixer pour les sons de splash, de collision et de victoire,</li>
-                <li>ouverture et fermeture de l'audio encadrant l'utilisation des <code>Mix_Chunk</code>.</li>
-            </ul>
-
-            <h3>Nettoyage (<code>src/main.c</code>)</h3>
+            <h4>Chargment des niveaux</h4>
             <p>
-                <code>clean(window, renderer, resources, &world)</code> : libération de toutes les textures, du mixeur audio, du renderer et de la fenêtre SDL2.
+                Les niveaux sont chargés à partir de fichiers PNG, leur nombre est déterminé automatiquement par la découverte des fichiers. Ils peuvent avoir
+                n’importe quelles dimensions.
             </p>
-            <img src="uml_diagram.svg" alt="UML Diagram" class="svg" />
+
+            <h4>Logique</h4>
+            <p>
+                La logique du jeu est calculée dans un système de coordonnées indépendant de la résolution de la fenêtre et des textures, ainsi que de la
+                position de la caméra. Les collisions entre objets sont détectées au pixel près, les proportions des objets sont tirées des textures.
+            </p>
+
+            <h4>Phisique</h4>
+
+            <p>La position et la vitesse du vaisseau sont stockées dans l’état du jeu, tandis que l’accélération est recalculée à chaque image.</p>
+
+            <p>
+                Il y a 3 forces : l’accélération constante vers l’avant, les contrôles de l’utilisateur et une force de traînée directement proportionnelle à la
+                vitesse.
+            </p>
+
+            <p>La position et la vitesse sont mises à jour à l’aide d’une simple méthode d’Euler.</p>
+
+            <p>La caméra est réglée pour s’approcher du point situé un peu en dessous du vaisseau en utilisant une décroissance exponentielle.</p>
+
+            <p>
+                <em>Accélérations combinées :</em><br />
+                a<sub>x</sub> = I<sub>x</sub>·v<sub>m</sub> − v<sub>x</sub>·c<sub>d</sub><br />
+                a<sub>y</sub> = −v<sub>c</sub> + I<sub>y</sub>·v<sub>m</sub> − v<sub>y</sub>·c<sub>d</sub>
+            </p>
+
+            <p>
+                <em>Mise à jour des vitesses :</em><br />
+                v<sub>x</sub> ← v<sub>x</sub> + a<sub>x</sub>·Δt<br />
+                v<sub>y</sub> ← v<sub>y</sub> + a<sub>y</sub>·Δt
+            </p>
+
+            <p>
+                <em>Mise à jour des positions :</em><br />
+                x ← clamp (x + v<sub>x</sub>·Δt, −L/2 + w/2, L/2 − w/2)<br />
+                y ← y + v<sub>y</sub>·Δt
+            </p>
+
+            <p>
+                <em>Suivi de la caméra :</em><br />
+                offset ← offset + [-y + offset₀ − offset]·(1 − e<sup>−k·Δt</sup>)
+            </p>
+
+            <p>
+                <em>Légende :</em><br />
+                I<sub>x</sub>, I<sub>y</sub> ∈ {−1,0,+1} selon les touches (gauche/droite, haut/bas)<br />
+                v<sub>c</sub> = vitesse de croisière,<br />
+                v<sub>m</sub> = vitesse de mouvement clavier,<br />
+                c<sub>d</sub> = coefficient de traînée,<br />
+                Δt = temps après la dernière image,<br />
+                L = largeur du niveau, w = largeur du vaisseau,<br />
+                offset₀ = position initiale de la caméra, k = vitesse d’approche de la caméra vers le vaisseau.
+            </p>
+
+            <h4>Graphisme</h4>
+            <p>
+                Les objets sont placés dans leur position à l’écran à l’aide d’une fonction qui applique la transformation nécessaire. La police est rechargée
+                dans la taille requise lorsque la taille de la fenêtre change.
+            </p>
+
+            <h4>Limitation du framerate</h4>
+            <p>
+                On lit le temps écoulé depuis le démarrage : t<sub>a</sub> = temps courant.<br />
+                On calcule l’instant de la prochaine image : t<sub>n</sub> = t<sub>préc</sub> + (1000 ÷ fps<sub>max</sub>).<br />
+                Si t<sub>n</sub> &gt; t<sub>a</sub>, on suspend l’exécution pendant Δt = t<sub>n</sub> – t<sub>a</sub>.
+            </p>
+
+            <img src="main_diagram.svg" alt="`main` Diagram" style="width: 100%" />
 
             <h2 id="problemes">Problèmes rencontrés et solutions détaillées</h2>
             <ul>
@@ -196,7 +223,7 @@ spacecorridor/
                 </li>
                 <li>
                     <p>
-                        Vitesse liée au taux de rafraîchissement : déplacement plus rapide à 165 Hz qu'à 60 Hz. Correction : ajout de
+                        Vitesse liée au taux de rafraîchissement : déplacement plus rapide à 165 Hz qu’à 60 Hz. Correction : ajout de
                         <code>last_frame_time</code> et <code>time_since_last_frame</code> (via <code>SDL_GetTicks64()</code>) dans <code>world_t</code>, et
                         multiplication des pas de déplacement par <code>time_since_last_frame</code>. Ajustement des constantes de vitesse dans
                         <code>src/constants.h</code>.
@@ -221,41 +248,60 @@ spacecorridor/
                 </li>
                 <li>
                     <p>
-                        Décalage entre affichage et son du splash screen : préchargement des <code>Mix_Chunk</code> et synchronisation de
-                        <code>Mix_PlayChannel</code> avec le rendu graphique. Sons de victoire et collision ajoutés pour renforcer le feedback.
+                        Limitation d’un tableau statique de murs : migration vers allocation dynamique (<code>malloc</code>) pour gérer un nombre variable
+                        d’obstacles et améliorer la gestion mémoire.
                     </p>
                     <aside>
-                        Commit : Added splash screen, changed sounds and font
+                        Commit : Use malloc for murs instead of a fixed array
                         <a
-                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/63b13e84b2015365c015ce62afc7222386c47b6f"
-                            >63b13e8</a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/a37075c01067407a258d2f592866bcb4dc4141bc"
+                            >a37075c</a
+                        >
+                    </aside>
+                </li>
+
+                <li>
+                    <p>
+                        Fuites mémoire avec SDL_ttf : les surfaces et textures créées pour le texte n’étaient ni libérées (avec <code>SDL_FreeSurface</code> et
+                        <code>SDL_DestroyTexture</code>), ni la lib SDL_ttf quittée (manque de <code>TTF_Quit</code>). Correction : libération explicite de
+                        chaque surface et texture après usage, implémentation et appel de <code>clean_ttf()</code> pour fermer proprement la sous-bibliothèque.
+                    </p>
+                    <aside>
+                        Commit : Fix TTF memory leaks
+                        <a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/578627359dbd294297466d357e6802d7d076ce21"
+                            >5786273</a
                         >
                     </aside>
                 </li>
                 <li>
                     <p>
-                        Limitation d'un tableau statique de murs : migration vers allocation dynamique (<code>malloc</code>) pour gérer un nombre variable
-                        d'obstacles et améliorer la gestion mémoire.
+                        Ressource introuvable sur système case-sensitive : le fichier police était nommé <code>COOPBL.TTF</code> mais le code recherchait
+                        <code>COOPBL.ttf</code>, causant un échec de chargement sous Linux. Correction : renommage du fichier en <code>COOPBL.ttf</code> pour
+                        correspondre exactement au nom utilisé dans le code.
                     </p>
                     <aside>
-                        Commit : Use malloc for murs instead of a fixed array
+                        Commit : Fix case of <code>COOPBL.ttf</code>
                         <a
-                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/63b13e84b2015365c015ce62afc7222386c47b6f"
-                            >63b13e8</a
+                            href="https://gitlab.univ-lorraine.fr/e46162u/projet-de-synthese-tp-3.1-ruscuk-danilkin/-/commit/7ada5b1302239315294042176395ddb58ba91f1b"
+                            >7ada5b1</a
                         >
                     </aside>
                 </li>
             </ul>
 
+            <img src="coordinate_systems.svg" alt="Coordinate systems" style="width: 100%; max-width: 500px" />
+
             <h2 id="metrologie">Métrologie et performances</h2>
             <div class="metrologie-block">
                 <img src="languages.svg" alt="Languages" class="languages" />
+
                 <ul>
-                    <li><strong>Nombre total de commits</strong> : 34</li>
+                    <li><strong>Nombre total de commits</strong> : 62</li>
                     <li>
                         <strong>Répartition des langages</strong> :
                         <ul>
-                            <li>C : ~94 % (≈ 500 lignes)</li>
+                            <li>C : ~94 % (739 lignes du code source, 346 lignes de commentaires)</li>
                             <li>Meson : ~3,8 %</li>
                             <li>Makefile : ~1,8 %</li>
                         </ul>
@@ -264,17 +310,11 @@ spacecorridor/
                         <strong>Performances</strong> (test sur Windows 11, Intel Core i7-12700KF, NVIDIA RTX 4070) :
                         <ul>
                             <li>FPS moyen stable à 240 en mode plein écran (1920x1080)</li>
-                            <li>Taille de l'exécutable Windows et libraries : ~50.4 MiB</li>
+                            <li>Taille de l’exécutable Windows et libraries : ~50.9 MiB</li>
                         </ul>
                     </li>
                 </ul>
             </div>
-
-            <h2 id="documentation">Documentation générée</h2>
-            <p>
-                La documentation complète (commentaires Doxygen) est accessible ici :
-                <a href="../builddir/doxygen/html/files.html">builddir/doxygen/html/files.html</a>.
-            </p>
         </div>
     </body>
 </html>

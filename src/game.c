@@ -99,6 +99,7 @@ void transition_to_quit(world_t *world) {
 /**
  * \brief La fonction met à jour les données en tenant compte de la physique du monde
  * \param exe_dir le chemin de l'exécutable, utilisé pour charger les ressources
+ * \param resources les ressources
  * \param world les données du monde
  */
 void update_data(const char *exe_dir, resources_t *resources, world_t *world) {
